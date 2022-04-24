@@ -1,4 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
+using PepsiPSK.Data.Model;
+using PSIShoppingEngine.Data;
+using System.Linq;
 
 namespace PepsiPSK.Controllers
 {
@@ -13,21 +16,18 @@ namespace PepsiPSK.Controllers
 
         private readonly ILogger<WeatherForecastController> _logger;
 
-        public WeatherForecastController(ILogger<WeatherForecastController> logger)
+        private readonly DataContext _context;
+
+        public WeatherForecastController(ILogger<WeatherForecastController> logger, DataContext context)
         {
             _logger = logger;
+            _context = context;
         }
 
         [HttpGet(Name = "GetWeatherForecast")]
-        public IEnumerable<WeatherForecast> Get()
+        public List<Item> Get()
         {
-            return Enumerable.Range(1, 5).Select(index => new WeatherForecast
-            {
-                Date = DateTime.Now.AddDays(index),
-                TemperatureC = Random.Shared.Next(-20, 55),
-                Summary = Summaries[Random.Shared.Next(Summaries.Length)]
-            })
-            .ToArray();
+            return _context.Items.ToList<Item>();
         }
     }
 }
