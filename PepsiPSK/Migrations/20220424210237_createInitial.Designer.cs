@@ -12,8 +12,8 @@ using PSIShoppingEngine.Data;
 namespace PepsiPSK.Migrations
 {
     [DbContext(typeof(DataContext))]
-    [Migration("20220424174118_FirstModels")]
-    partial class FirstModels
+    [Migration("20220424210237_createInitial")]
+    partial class createInitial
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -78,10 +78,12 @@ namespace PepsiPSK.Migrations
                     b.Property<Guid>("FlowerId")
                         .HasColumnType("uuid");
 
-                    b.Property<Guid>("OrderId")
+                    b.Property<Guid?>("OrderId")
                         .HasColumnType("uuid");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("FlowerId");
 
                     b.HasIndex("OrderId");
 
@@ -90,11 +92,20 @@ namespace PepsiPSK.Migrations
 
             modelBuilder.Entity("PepsiPSK.Model.Transaction", b =>
                 {
-                    b.HasOne("PepsiPSK.Model.Order", null)
+                    b.HasOne("PepsiPSK.Model.Flower", null)
                         .WithMany("Transactions")
-                        .HasForeignKey("OrderId")
+                        .HasForeignKey("FlowerId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.HasOne("PepsiPSK.Model.Order", null)
+                        .WithMany("Transactions")
+                        .HasForeignKey("OrderId");
+                });
+
+            modelBuilder.Entity("PepsiPSK.Model.Flower", b =>
+                {
+                    b.Navigation("Transactions");
                 });
 
             modelBuilder.Entity("PepsiPSK.Model.Order", b =>

@@ -3,8 +3,6 @@
     public class Transaction
     {
         public Guid Id { get; set; }
-
-        public Guid OrderId  { get; set; }
         public Guid FlowerId { get; set; }
         public int Diference { get; set; }
     }

@@ -8,6 +8,7 @@
         public string? Description { get; set; }
         public int Quantity { get; set; }
         public string? PhotoLink { get; set; }
+        public ICollection<Transaction> Transactions { get; set; }
 
     }
 }
