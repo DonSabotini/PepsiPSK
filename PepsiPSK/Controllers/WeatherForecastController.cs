@@ -1,5 +1,4 @@
 using Microsoft.AspNetCore.Mvc;
-using PepsiPSK.Data.Model;
 using PSIShoppingEngine.Data;
 using System.Linq;
 
@@ -24,10 +23,6 @@ namespace PepsiPSK.Controllers
             _context = context;
         }
 
-        [HttpGet(Name = "GetWeatherForecast")]
-        public List<Item> Get()
-        {
-            return _context.Items.ToList<Item>();
-        }
+       
     }
 }

@@ -1,5 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using PepsiPSK.Data.Model;
+using PepsiPSK.Model;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,6 +11,9 @@ namespace PSIShoppingEngine.Data
     {
         public DataContext(DbContextOptions<DataContext> options) : base(options) { }
 
-        public DbSet<Item> Items { get; set; }
+        public DbSet<Flower> Flowers { get; set; }
+        public DbSet<Order> Orders { get; set; }
+        public DbSet<Transaction> Transactions { get; set; }
+
     }
 }
