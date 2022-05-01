@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using PSIShoppingEngine.Data;
 using PepsiPSK.Model;
+using PepsiPSK.Data.Repositories;
 
 namespace PepsiPSK.Controllers.Photos
 {
@@ -15,25 +16,25 @@ namespace PepsiPSK.Controllers.Photos
     [ApiController]
     public class PhotosController : ControllerBase
     {
-        private readonly DataContext _context;
+        private readonly PhotoRepository _repository;
 
-        public PhotosController(DataContext context)
+        public PhotosController(PhotoRepository repository)
         {
-            _context = context;
+            _repository = repository;
         }
 
         // GET: api/Photos
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Photo>>> GetPhotos()
         {
-            return await _context.Photos.ToListAsync();
+            return await _repository.GetAll();
         }
 
         // GET: api/Photos/5
         [HttpGet("{id}")]
         public async Task<ActionResult<Photo>> GetPhoto(Guid id)
         {
-            var photo = await _context.Photos.FindAsync(id);
+            var photo = await _repository.Get(id);
 
             if (photo == null)
             {
@@ -53,15 +54,13 @@ namespace PepsiPSK.Controllers.Photos
                 return BadRequest();
             }
 
-            _context.Entry(photo).State = EntityState.Modified;
-
             try
             {
-                await _context.SaveChangesAsync();
+                await _repository.Update(photo);
             }
             catch (DbUpdateConcurrencyException)
             {
-                if (!PhotoExists(id))
+                if (!_repository.Exists(id))
                 {
                     return NotFound();
                 }
@@ -79,8 +78,7 @@ namespace PepsiPSK.Controllers.Photos
         [HttpPost]
         public async Task<ActionResult<Photo>> PostPhoto(Photo photo)
         {
-            _context.Photos.Add(photo);
-            await _context.SaveChangesAsync();
+            await _repository.Add(photo);
 
             return CreatedAtAction("GetPhoto", new { id = photo.Id }, photo);
         }
@@ -89,21 +87,15 @@ namespace PepsiPSK.Controllers.Photos
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeletePhoto(Guid id)
         {
-            var photo = await _context.Photos.FindAsync(id);
+            var photo = await _repository.Get(id);
             if (photo == null)
             {
                 return NotFound();
             }
 
-            _context.Photos.Remove(photo);
-            await _context.SaveChangesAsync();
+            _repository.Delete(photo);
 
             return NoContent();
-        }
-
-        private bool PhotoExists(Guid id)
-        {
-            return _context.Photos.Any(e => e.Id == id);
         }
     }
 }
