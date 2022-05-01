@@ -10,7 +10,7 @@ namespace PSIShoppingEngine.Data
     public class DataContext : DbContext
     {
         public DataContext(DbContextOptions<DataContext> options) : base(options) { }
-
+        public DbSet<Photo> Photos { get; set; }
         public DbSet<Flower> Flowers { get; set; }
         public DbSet<Order> Orders { get; set; }
         public DbSet<Transaction> Transactions { get; set; }
