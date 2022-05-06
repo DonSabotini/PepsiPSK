@@ -1,0 +1,54 @@
+﻿using Microsoft.AspNetCore.Mvc;
+using PepsiPSK.Entities;
+using PepsiPSK.Models.Order;
+using PepsiPSK.Services.Orders;
+
+namespace PepsiPSK.Controllers
+{
+    [ApiController]
+    [Route("[controller]")]
+    public class OrdersController : ControllerBase
+    {
+        private readonly IOrderService _orderService;
+
+        public OrdersController(IOrderService orderService)
+        {
+            _orderService = orderService;
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> GetOrders()
+        {
+            var orders = await _orderService.GetOrders();
+            return Ok(orders);
+        }
+
+        [HttpGet("{guid}")]
+        public async Task<IActionResult> GetOrderById(Guid guid)
+        {
+            var order = await _orderService.GetOrderById(guid);
+            return order == null ? NotFound() : Ok(order);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> AddOrder(Order order)
+        {
+            var addedOrder = await _orderService.AddOrder(order);
+            return Ok(addedOrder);
+        }
+
+        [HttpPut]
+        public async Task<IActionResult> UpdateOrder(OrderDto orderDto)
+        {
+            var order = await _orderService.UpdateOrder(orderDto);
+            return order == null ? NotFound() : Ok(order);
+        }
+
+        [HttpDelete("{guid}")]
+        public async Task<IActionResult> DeleteOrder(Guid guid)
+        {
+            var successMessage = await _orderService.DeleteOrder(guid);
+            return successMessage == null ? NotFound() : Ok(successMessage);
+        }
+    }
+}

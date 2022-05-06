@@ -1,4 +1,4 @@
-﻿namespace PepsiPSK.Model
+﻿namespace PepsiPSK.Entities
 {
     public class Transaction
     {

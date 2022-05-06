@@ -1,4 +1,7 @@
 using Microsoft.EntityFrameworkCore;
+using PepsiPSK.Services.Flowers;
+using PepsiPSK.Services.Transactions;
+using PepsiPSK.Services.Orders;
 using PSIShoppingEngine.Data;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -12,7 +15,10 @@ builder.Services.AddDbContext<DataContext>(options =>
 });
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
-
+builder.Services.AddAutoMapper(typeof(Program));
+builder.Services.AddScoped<IFlowerService, FlowerService>();
+builder.Services.AddScoped<IOrderService, OrderService>();
+builder.Services.AddScoped<ITransactionService, TransactionService>();
 
 var app = builder.Build();
 
