@@ -1,9 +1,11 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using PepsiPSK.Entities;
 using PepsiPSK.Services.Transactions;
 
 namespace PepsiPSK.Controllers
 {
+    [Authorize]
     [ApiController]
     [Route("[controller]")]
     public class TransactionsController : ControllerBase

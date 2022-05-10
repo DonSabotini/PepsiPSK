@@ -1,10 +1,12 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using PepsiPSK.Entities;
 using PepsiPSK.Models.Order;
 using PepsiPSK.Services.Orders;
 
 namespace PepsiPSK.Controllers
 {
+    [Authorize]
     [ApiController]
     [Route("[controller]")]
     public class OrdersController : ControllerBase
