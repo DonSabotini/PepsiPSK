@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using PepsiPSK.Entities;
 using PepsiPSK.Models.Flower;
+using PepsiPSK.Services.Users;
 using PSIShoppingEngine.Data;
 
 namespace PepsiPSK.Services.Flowers
@@ -10,19 +11,21 @@ namespace PepsiPSK.Services.Flowers
     {
         private readonly DataContext _context;
         private readonly IMapper _mapper;
+        private readonly IUserService _userService;
 
-        public FlowerService(DataContext context, IMapper mapper)
+        public FlowerService(DataContext context, IMapper mapper, IUserService userService)
         {
             _context = context;
             _mapper = mapper;
+            _userService = userService;
         }
 
-        public async Task<List<FlowerDto>> GetFlowers()
+        public async Task<List<Flower>> GetFlowers()
         {
-            return await _context.Flowers.Select(flower => _mapper.Map<FlowerDto>(flower)).ToListAsync();
+            return await _context.Flowers.Select(flower => flower).ToListAsync();
         }
 
-        public async Task<FlowerDto?> GetFlowerById(Guid guid)
+        public async Task<Flower?> GetFlowerById(Guid guid)
         {
             var flower = await _context.Flowers.FirstOrDefaultAsync(f => f.Id == guid);
 
@@ -31,36 +34,36 @@ namespace PepsiPSK.Services.Flowers
                 return null;
             }
 
-            FlowerDto flowerDto = _mapper.Map<FlowerDto>(flower);
-            return flowerDto;
+            return flower;
         }
 
-        public async Task<Flower> AddFlower(Flower flower)
+        public async Task<Flower> AddFlower(AddFlowerDto addFlowerDto)
         {
-            await _context.Flowers.AddAsync(flower);
+            Flower newFlower = _mapper.Map<Flower>(addFlowerDto);
+            // newFlower.User = await _userService.RetrieveCurrentUser();
+            await _context.Flowers.AddAsync(newFlower);
             await _context.SaveChangesAsync();
-            var addedFlower = await _context.Flowers.FirstOrDefaultAsync(f => f.Id == flower.Id);
+            var addedFlower = await _context.Flowers.FirstOrDefaultAsync(f => f.Id == newFlower.Id);
             return addedFlower;
         }
 
-        public async Task<FlowerDto?> UpdateFlower(FlowerDto flowerDto)
+        public async Task<Flower?> UpdateFlower(UpdateFlowerDto updateFlowerDto)
         {
-            var flower = await _context.Flowers.FirstOrDefaultAsync(f => f.Id == flowerDto.Id);
+            var flower = await _context.Flowers.FirstOrDefaultAsync(f => f.Id == updateFlowerDto.Id);
 
             if (flower == null)
             {
                 return null;
             }
           
-            flower.Name = flowerDto.Name;
-            flower.Price = flowerDto.Price;
-            flower.Description = flowerDto.Description;
-            flower.Quantity = flowerDto.Quantity;
+            flower.Name = updateFlowerDto.Name;
+            flower.Price = updateFlowerDto.Price;
+            flower.Description = updateFlowerDto.Description;
+            flower.Quantity = updateFlowerDto.Quantity;
             _context.Flowers.Update(flower);
             await _context.SaveChangesAsync();
 
-            FlowerDto updatedFlower = _mapper.Map<FlowerDto>(flower);
-            return updatedFlower;
+            return flower;
         }
 
         public async Task<string?> DeleteFlower(Guid guid)

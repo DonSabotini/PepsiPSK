@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using PSIShoppingEngine.Data;
@@ -11,9 +12,10 @@ using PSIShoppingEngine.Data;
 namespace PepsiPSK.Migrations
 {
     [DbContext(typeof(DataContext))]
-    partial class DataContextModelSnapshot : ModelSnapshot
+    [Migration("20220512114049_PrecisionLimitFixes")]
+    partial class PrecisionLimitFixes
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -208,7 +210,8 @@ namespace PepsiPSK.Migrations
                         .HasColumnType("integer");
 
                     b.Property<decimal>("TotalCost")
-                        .HasColumnType("numeric");
+                        .HasPrecision(1000, 2)
+                        .HasColumnType("numeric(1000,2)");
 
                     b.Property<string>("UserId")
                         .HasColumnType("text");

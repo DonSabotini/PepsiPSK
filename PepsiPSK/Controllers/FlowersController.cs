@@ -1,6 +1,5 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using PepsiPSK.Entities;
 using PepsiPSK.Models.Flower;
 using PepsiPSK.Services.Flowers;
 
@@ -33,14 +32,14 @@ namespace PepsiPSK.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> AddFlower(Flower flower)
+        public async Task<IActionResult> AddFlower(AddFlowerDto addFlowerDto)
         {
-            var addedFlower = await _flowerService.AddFlower(flower);
+            var addedFlower = await _flowerService.AddFlower(addFlowerDto);
             return Ok(addedFlower);
         }
 
         [HttpPut]
-        public async Task<IActionResult> UpdateFlower(FlowerDto flowerDto)
+        public async Task<IActionResult> UpdateFlower(UpdateFlowerDto flowerDto)
         {
             var flower = await _flowerService.UpdateFlower(flowerDto);
             return flower == null ? NotFound() : Ok(flower);

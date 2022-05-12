@@ -11,33 +11,36 @@ namespace PepsiPSK.Services.Users
 {
     public class UserService : IUserService
     {
-        private readonly UserManager<User> userManager;
+        private readonly UserManager<User> _userManager;
         private readonly IConfiguration _configuration;
+        private IHttpContextAccessor _httpContextAccessor;
 
-        public UserService(UserManager<User> userManager, IConfiguration configuration)
+        public UserService(UserManager<User> userManager, IConfiguration configuration, IHttpContextAccessor httpContextAccessor)
         {
-            this.userManager = userManager;
+            _userManager = userManager;
             _configuration = configuration;
+            _httpContextAccessor = httpContextAccessor;
         }
 
         public async Task<AuthenticationResponse?> Login(LoginDto loginDto)
         {
-            var user = await userManager.FindByNameAsync(loginDto.LoginUsername);
+            var user = await _userManager.FindByNameAsync(loginDto.LoginUsername);
 
             var respone = new AuthenticationResponse();
 
             if (user == null) return null;
 
-            bool isCorrectPassword = await userManager.CheckPasswordAsync(user, loginDto.LoginPassword);
+            bool isCorrectPassword = await _userManager.CheckPasswordAsync(user, loginDto.LoginPassword);
 
-            if (!isCorrectPassword) {
+            if (!isCorrectPassword)
+            {
                 respone.IsSuccessful = false;
                 respone.Message = "Wrong password!";
                 respone.Content = null;
                 return respone;
             }
 
-            var userRoles = await userManager.GetRolesAsync(user);
+            var userRoles = await _userManager.GetRolesAsync(user);
 
             var authClaims = new List<Claim>
                 {
@@ -72,7 +75,7 @@ namespace PepsiPSK.Services.Users
         {
             var respone = new AuthenticationResponse();
 
-            var existingUser = await userManager.FindByNameAsync(registrationDto.RegistrationUsername);
+            var existingUser = await _userManager.FindByNameAsync(registrationDto.RegistrationUsername);
 
             if (existingUser != null)
             {
@@ -91,9 +94,9 @@ namespace PepsiPSK.Services.Users
                 SecurityStamp = Guid.NewGuid().ToString(),
             };
 
-            var identityResult = await userManager.CreateAsync(user, registrationDto.RegistrationPassword);
+            var identityResult = await _userManager.CreateAsync(user, registrationDto.RegistrationPassword);
 
-            if(!identityResult.Succeeded)
+            if (!identityResult.Succeeded)
             {
                 respone.IsSuccessful = false;
                 respone.Message = "Failed to register!";
@@ -105,6 +108,14 @@ namespace PepsiPSK.Services.Users
             respone.Message = "Registered successfully!";
             respone.Content = null;
             return respone;
+        }
+
+        public async Task<User> RetrieveCurrentUser()
+        {
+            ClaimsPrincipal currentUser = _httpContextAccessor.HttpContext.User;
+            string currentUserName = currentUser.FindFirst(ClaimTypes.NameIdentifier).Value;
+            User userToRetrieve = await _userManager.FindByNameAsync(currentUserName);
+            return userToRetrieve;
         }
     }
 }

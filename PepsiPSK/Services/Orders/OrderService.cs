@@ -1,6 +1,8 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using AutoMapper;
+using Microsoft.EntityFrameworkCore;
 using PepsiPSK.Entities;
 using PepsiPSK.Models.Order;
+using PepsiPSK.Services.Users;
 using PSIShoppingEngine.Data;
 
 namespace PepsiPSK.Services.Orders
@@ -8,10 +10,12 @@ namespace PepsiPSK.Services.Orders
     public class OrderService : IOrderService
     {
         private readonly DataContext _context;
+        private readonly IUserService _userService;
 
-        public OrderService(DataContext context)
+        public OrderService(DataContext context, IUserService userService)
         {
             _context = context;
+            _userService = userService;
         }
 
         public async Task<List<Order>> GetOrders()
@@ -27,22 +31,23 @@ namespace PepsiPSK.Services.Orders
 
         public async Task<Order> AddOrder(Order order)
         {
+            // order.User = await _userService.RetrieveCurrentUser();
             await _context.Orders.AddAsync(order);
             await _context.SaveChangesAsync();
             var addedOrder = await _context.Orders.FirstOrDefaultAsync(o => o.Id == order.Id);
             return addedOrder;
         }
 
-        public async Task<Order?> UpdateOrder(OrderDto orderDto)
+        public async Task<Order?> UpdateOrder(UpdateOrderDto updateOrderDto)
         {
-            var order = await _context.Orders.Include(t => t.Transactions).FirstOrDefaultAsync(o => o.Id == orderDto.Id);
+            var order = await _context.Orders.Include(t => t.Transactions).FirstOrDefaultAsync(o => o.Id == updateOrderDto.Id);
 
             if (order == null)
             {
                 return null;
             }
 
-            order.Description = orderDto.Description;
+            order.Description = updateOrderDto.Description;
             await _context.SaveChangesAsync();
             return order;
         }

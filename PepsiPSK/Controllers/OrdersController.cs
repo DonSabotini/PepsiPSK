@@ -40,9 +40,9 @@ namespace PepsiPSK.Controllers
         }
 
         [HttpPut]
-        public async Task<IActionResult> UpdateOrder(OrderDto orderDto)
+        public async Task<IActionResult> UpdateOrder(UpdateOrderDto updateOrderDto)
         {
-            var order = await _orderService.UpdateOrder(orderDto);
+            var order = await _orderService.UpdateOrder(updateOrderDto);
             return order == null ? NotFound() : Ok(order);
         }
 

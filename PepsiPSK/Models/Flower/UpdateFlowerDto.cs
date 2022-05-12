@@ -1,10 +1,9 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
 
-namespace PepsiPSK.Entities
+namespace PepsiPSK.Models.Flower
 {
-    public class Flower
+    public class UpdateFlowerDto
     {
         public Guid Id { get; set; }
         public string Name { get; set; }
@@ -20,9 +19,5 @@ namespace PepsiPSK.Entities
         public int Quantity { get; set; }
 
         public string? PhotoLink { get; set; }
-        public ICollection<Transaction> Transactions { get; set; } = new List<Transaction>();
-        public DateTime AdditionTime { get; set; } = DateTime.UtcNow;
-
-        public User User { get; set; }
     }
 }
