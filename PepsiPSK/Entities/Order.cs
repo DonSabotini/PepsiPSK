@@ -1,7 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
-using PepsiPSK.Enums;
+﻿using PepsiPSK.Enums;
 using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
 
 namespace PepsiPSK.Entities
 {

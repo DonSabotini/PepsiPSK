@@ -28,13 +28,7 @@ namespace PepsiPSK.Services.Flowers
         public async Task<Flower?> GetFlowerById(Guid guid)
         {
             var flower = await _context.Flowers.FirstOrDefaultAsync(f => f.Id == guid);
-
-            if (flower == null)
-            {
-                return null;
-            }
-
-            return flower;
+            return flower ?? null;
         }
 
         public async Task<Flower> AddFlower(AddFlowerDto addFlowerDto)
@@ -59,7 +53,6 @@ namespace PepsiPSK.Services.Flowers
             flower.Name = updateFlowerDto.Name;
             flower.Price = updateFlowerDto.Price;
             flower.Description = updateFlowerDto.Description;
-            flower.Quantity = updateFlowerDto.Quantity;
             _context.Flowers.Update(flower);
             await _context.SaveChangesAsync();
 

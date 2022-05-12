@@ -20,7 +20,7 @@ namespace PepsiPSK.Controllers
         {
             var loginResult = await _userService.Login(loginDto);
 
-            if(loginResult == null)
+            if (loginResult == null)
             {
                 return NotFound();
             }
@@ -41,7 +41,7 @@ namespace PepsiPSK.Controllers
 
             if (!registrationResult.IsSuccessful)
             {
-                return Conflict(registrationResult);
+                return BadRequest(registrationResult);
             }
 
             return Ok(registrationResult);

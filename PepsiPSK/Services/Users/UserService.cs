@@ -13,7 +13,7 @@ namespace PepsiPSK.Services.Users
     {
         private readonly UserManager<User> _userManager;
         private readonly IConfiguration _configuration;
-        private IHttpContextAccessor _httpContextAccessor;
+        private readonly IHttpContextAccessor _httpContextAccessor;
 
         public UserService(UserManager<User> userManager, IConfiguration configuration, IHttpContextAccessor httpContextAccessor)
         {
