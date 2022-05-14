@@ -1,5 +1,4 @@
 ﻿using PepsiPSK.Authentication;
-using PepsiPSK.Entities;
 using PepsiPSK.Models.User;
 
 namespace PepsiPSK.Services.Users
@@ -8,6 +7,6 @@ namespace PepsiPSK.Services.Users
     {
         Task<AuthenticationResponse?> Login(LoginDto loginDto);
         Task<AuthenticationResponse> Register(RegistrationDto registrationDto);
-        Task<User> RetrieveCurrentUser();
+        string RetrieveCurrentUserId();
     }
 }

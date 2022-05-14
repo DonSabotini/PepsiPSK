@@ -45,6 +45,7 @@ namespace PepsiPSK.Services.Users
             var authClaims = new List<Claim>
                 {
                     new Claim(ClaimTypes.Name, user.UserName),
+                    new Claim(ClaimTypes.NameIdentifier, user.Id),
                     new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
                 };
 
@@ -58,7 +59,7 @@ namespace PepsiPSK.Services.Users
             var token = new JwtSecurityToken(
                 audience: _configuration["JWT:ValidAudience"],
                 issuer: _configuration["JWT:ValidIssuer"],
-                expires: DateTime.Now.AddHours(3),
+                expires: DateTime.Now.AddHours(12),
                 claims: authClaims,
                 signingCredentials: new SigningCredentials(authSigningKey, SecurityAlgorithms.HmacSha256)
                 );
@@ -104,18 +105,17 @@ namespace PepsiPSK.Services.Users
                 return respone;
             }
 
+            await _userManager.AddToRoleAsync(user, RoleList.User);
+
             respone.IsSuccessful = true;
             respone.Message = "Registered successfully!";
             respone.Content = null;
             return respone;
         }
 
-        public async Task<User> RetrieveCurrentUser()
+        public string RetrieveCurrentUserId()
         {
-            ClaimsPrincipal currentUser = _httpContextAccessor.HttpContext.User;
-            string currentUserName = currentUser.FindFirst(ClaimTypes.NameIdentifier).Value;
-            User userToRetrieve = await _userManager.FindByNameAsync(currentUserName);
-            return userToRetrieve;
+            return _httpContextAccessor?.HttpContext?.User.FindFirstValue(ClaimTypes.NameIdentifier);
         }
     }
 }

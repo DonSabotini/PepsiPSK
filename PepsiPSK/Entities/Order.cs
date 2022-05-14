@@ -17,6 +17,6 @@ namespace PepsiPSK.Entities
 
         public DateTime CreationTime { get; set; } = DateTime.UtcNow;
 
-        public User? User { get; set; }
+        public string? UserId { get; set; }
     }
 }

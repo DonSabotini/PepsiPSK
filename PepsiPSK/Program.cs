@@ -33,15 +33,12 @@ builder.Services.AddAuthentication(options =>
         IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration["JWT:Secret"]))
     };
 });
-
 builder.Services.AddControllers();
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddDbContext<DataContext>(options =>
 {
     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection"));
 });
-builder.Services.AddEndpointsApiExplorer();
-
 builder.Services.AddAutoMapper(typeof(Program));
 builder.Services.AddScoped<IFlowerService, FlowerService>();
 builder.Services.AddScoped<IOrderService, OrderService>();
@@ -50,15 +47,14 @@ builder.Services.AddScoped<IUserService, UserService>();
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
     
 }
 
-app.UseAuthentication();
 app.UseHttpsRedirection();
 app.UseRouting();
+app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
 

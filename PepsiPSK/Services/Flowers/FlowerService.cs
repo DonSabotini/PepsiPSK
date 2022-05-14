@@ -34,7 +34,7 @@ namespace PepsiPSK.Services.Flowers
         public async Task<Flower> AddFlower(AddFlowerDto addFlowerDto)
         {
             Flower newFlower = _mapper.Map<Flower>(addFlowerDto);
-            // newFlower.User = await _userService.RetrieveCurrentUser();
+            newFlower.UserId = _userService.RetrieveCurrentUserId();
             await _context.Flowers.AddAsync(newFlower);
             await _context.SaveChangesAsync();
             var addedFlower = await _context.Flowers.FirstOrDefaultAsync(f => f.Id == newFlower.Id);

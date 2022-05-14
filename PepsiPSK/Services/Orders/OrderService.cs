@@ -31,7 +31,7 @@ namespace PepsiPSK.Services.Orders
 
         public async Task<Order> AddOrder(Order order)
         {
-            // order.User = await _userService.RetrieveCurrentUser();
+            order.UserId = _userService.RetrieveCurrentUserId();
             await _context.Orders.AddAsync(order);
             await _context.SaveChangesAsync();
             var addedOrder = await _context.Orders.FirstOrDefaultAsync(o => o.Id == order.Id);

@@ -21,6 +21,6 @@ namespace PepsiPSK.Entities
         public ICollection<Transaction> Transactions { get; set; } = new List<Transaction>();
         public DateTime AdditionTime { get; set; } = DateTime.UtcNow;
 
-        public User User { get; set; }
+        public string UserId { get; set; }
     }
 }
