@@ -1,8 +1,7 @@
-﻿using AutoMapper;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using PepsiPSK.Entities;
 using PepsiPSK.Models.Order;
-using PepsiPSK.Services.Users;
+using PepsiPSK.Utils.Authentication;
 using PSIShoppingEngine.Data;
 
 namespace PepsiPSK.Services.Orders
@@ -10,28 +9,38 @@ namespace PepsiPSK.Services.Orders
     public class OrderService : IOrderService
     {
         private readonly DataContext _context;
-        private readonly IUserService _userService;
+        private readonly ICurrentUserInfoRetriever _currentUserInfoRetriever;
 
-        public OrderService(DataContext context, IUserService userService)
+        public OrderService(DataContext context, ICurrentUserInfoRetriever currentUserInfoRetriever)
         {
             _context = context;
-            _userService = userService;
+            _currentUserInfoRetriever = currentUserInfoRetriever;
+        }
+
+        private string GetCurrentUserId()
+        {
+            return _currentUserInfoRetriever.RetrieveCurrentUserId();
+        }
+
+        private bool AdminCheck()
+        {
+            return _currentUserInfoRetriever.CheckIfCurrentUserIsAdmin();
         }
 
         public async Task<List<Order>> GetOrders()
         {
-            return await _context.Orders.Select(order => order).Include(t => t.Transactions).ToListAsync();
+            return AdminCheck() ? await _context.Orders.Include(t => t.Transactions).ToListAsync() : await _context.Orders.Include(t => t.Transactions).Where(o => o.UserId == GetCurrentUserId()).ToListAsync();
         }
 
         public async Task<Order?> GetOrderById(Guid guid)
         {
-            var order = await _context.Orders.Include(t => t.Transactions).FirstOrDefaultAsync(o => o.Id == guid);
+            var order = AdminCheck() ? await _context.Orders.Include(t => t.Transactions).FirstOrDefaultAsync(o => o.Id == guid) : await _context.Orders.Include(t => t.Transactions).FirstOrDefaultAsync(o => o.Id == guid && o.UserId == GetCurrentUserId());
             return order ?? null;
         }
 
         public async Task<Order> AddOrder(Order order)
         {
-            order.UserId = _userService.RetrieveCurrentUserId();
+            order.UserId = GetCurrentUserId();
             await _context.Orders.AddAsync(order);
             await _context.SaveChangesAsync();
             var addedOrder = await _context.Orders.FirstOrDefaultAsync(o => o.Id == order.Id);
@@ -40,7 +49,7 @@ namespace PepsiPSK.Services.Orders
 
         public async Task<Order?> UpdateOrder(UpdateOrderDto updateOrderDto)
         {
-            var order = await _context.Orders.Include(t => t.Transactions).FirstOrDefaultAsync(o => o.Id == updateOrderDto.Id);
+            var order = AdminCheck() ? await _context.Orders.Include(t => t.Transactions).FirstOrDefaultAsync(o => o.Id == updateOrderDto.Id) : await _context.Orders.Include(t => t.Transactions).FirstOrDefaultAsync(o => o.Id == updateOrderDto.Id && o.UserId == GetCurrentUserId());
 
             if (order == null)
             {
@@ -54,7 +63,7 @@ namespace PepsiPSK.Services.Orders
 
         public async Task<string?> DeleteOrder(Guid guid)
         {
-            var order = await _context.Orders.FirstOrDefaultAsync(o => o.Id == guid);
+            var order = AdminCheck() ? await _context.Orders.FirstOrDefaultAsync(o => o.Id == guid) : await _context.Orders.FirstOrDefaultAsync(o => o.Id == guid && o.UserId == GetCurrentUserId());
 
             if (order == null)
             {

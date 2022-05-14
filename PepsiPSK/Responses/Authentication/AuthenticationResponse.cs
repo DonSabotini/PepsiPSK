@@ -1,4 +1,4 @@
-﻿namespace PepsiPSK.Authentication
+﻿namespace PepsiPSK.Responses.Authentication
 {
     public class AuthenticationResponse
     {

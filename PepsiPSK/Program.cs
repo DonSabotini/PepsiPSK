@@ -2,6 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using PepsiPSK.Services.Flowers;
 using PepsiPSK.Services.Transactions;
 using PepsiPSK.Services.Orders;
+using PepsiPSK.Utils.Authentication;
 using PSIShoppingEngine.Data;
 using Microsoft.AspNetCore.Identity;
 using PepsiPSK.Entities;
@@ -44,6 +45,7 @@ builder.Services.AddScoped<IFlowerService, FlowerService>();
 builder.Services.AddScoped<IOrderService, OrderService>();
 builder.Services.AddScoped<ITransactionService, TransactionService>();
 builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddScoped<ICurrentUserInfoRetriever, CurrentUserInfoRetriever>();
 
 var app = builder.Build();
 

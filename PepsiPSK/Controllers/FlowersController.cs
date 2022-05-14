@@ -5,7 +5,7 @@ using PepsiPSK.Services.Flowers;
 
 namespace PepsiPSK.Controllers
 {
-    [Authorize]
+    [Authorize(Roles ="User, Admin")]
     [ApiController]
     [Route("[controller]")]
     public class FlowersController : ControllerBase

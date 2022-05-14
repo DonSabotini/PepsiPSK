@@ -1,4 +1,5 @@
 ﻿using PepsiPSK.Entities;
+using PepsiPSK.Models.Transaction;
 
 namespace PepsiPSK.Services.Transactions
 {
@@ -6,8 +7,8 @@ namespace PepsiPSK.Services.Transactions
     {
         Task<List<Transaction>> GetTransactions();
         Task<Transaction?> GetTransactionById(Guid guid);
-        Task<Transaction> AddTransaction(Transaction transaction);
-        Task<Transaction?> UpdateTransaction(Transaction transaction);
+        Task<Transaction> AddTransaction(AddTransactionDto addTransactionDto);
+        Task<Transaction?> UpdateTransaction(UpdateTransactionDto updateTransactionDto);
         Task<string?> DeleteTransaction(Guid guid);
     }
 }

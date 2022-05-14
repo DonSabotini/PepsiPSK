@@ -1,4 +1,4 @@
-﻿namespace PepsiPSK.Authentication
+﻿namespace PepsiPSK.Constants
 {
     public static class RoleList
     {

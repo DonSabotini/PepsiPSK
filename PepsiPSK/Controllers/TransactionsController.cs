@@ -1,11 +1,12 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using PepsiPSK.Entities;
+using PepsiPSK.Models.Transaction;
 using PepsiPSK.Services.Transactions;
 
 namespace PepsiPSK.Controllers
 {
-    [Authorize]
+    [Authorize(Roles = "User, Admin")]
     [ApiController]
     [Route("[controller]")]
     public class TransactionsController : ControllerBase
@@ -32,16 +33,16 @@ namespace PepsiPSK.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> AddTransaction(Transaction transaction)
+        public async Task<IActionResult> AddTransaction(AddTransactionDto addTransactionDto)
         {
-            var adddedTransaction = await _transactionService.AddTransaction(transaction);
+            var adddedTransaction = await _transactionService.AddTransaction(addTransactionDto);
             return Ok(adddedTransaction);
         }
 
         [HttpPut]
-        public async Task<IActionResult> UpdateTransaction(Transaction transaction)
+        public async Task<IActionResult> UpdateTransaction(UpdateTransactionDto updateTransactionDto)
         {
-            var updatedTransaction = await _transactionService.UpdateTransaction(transaction);
+            var updatedTransaction = await _transactionService.UpdateTransaction(updateTransactionDto);
             return updatedTransaction == null ? NotFound() : Ok(updatedTransaction);
         }
 

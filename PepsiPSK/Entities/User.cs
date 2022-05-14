@@ -11,5 +11,7 @@ namespace PepsiPSK.Entities
         public ICollection<Order> SubmittedOrders { get; set; } = new List<Order>();
 
         public ICollection<Flower> FlowersForSelling { get; set; } = new List<Flower>();
+
+        public ICollection<Transaction> PersonalTransactions { get; set; } = new List<Transaction>();
     }
 }

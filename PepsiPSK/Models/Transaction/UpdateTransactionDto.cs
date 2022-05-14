@@ -1,10 +1,9 @@
-﻿namespace PepsiPSK.Entities
+﻿namespace PepsiPSK.Models.Transaction
 {
-    public class Transaction
+    public class UpdateTransactionDto
     {
         public Guid Id { get; set; }
         public Guid FlowerId { get; set; }
         public int Diference { get; set; }
-        public string? UserId { get; set; }
     }
 }

@@ -6,7 +6,7 @@ using PepsiPSK.Services.Orders;
 
 namespace PepsiPSK.Controllers
 {
-    [Authorize]
+    [Authorize(Roles = "User, Admin")]
     [ApiController]
     [Route("[controller]")]
     public class OrdersController : ControllerBase

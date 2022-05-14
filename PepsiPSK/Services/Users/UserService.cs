@@ -1,8 +1,9 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.IdentityModel.Tokens;
-using PepsiPSK.Authentication;
+using PepsiPSK.Constants;
 using PepsiPSK.Entities;
 using PepsiPSK.Models.User;
+using PepsiPSK.Responses.Authentication;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
@@ -13,13 +14,11 @@ namespace PepsiPSK.Services.Users
     {
         private readonly UserManager<User> _userManager;
         private readonly IConfiguration _configuration;
-        private readonly IHttpContextAccessor _httpContextAccessor;
 
-        public UserService(UserManager<User> userManager, IConfiguration configuration, IHttpContextAccessor httpContextAccessor)
+        public UserService(UserManager<User> userManager, IConfiguration configuration)
         {
             _userManager = userManager;
             _configuration = configuration;
-            _httpContextAccessor = httpContextAccessor;
         }
 
         public async Task<AuthenticationResponse?> Login(LoginDto loginDto)
@@ -111,11 +110,6 @@ namespace PepsiPSK.Services.Users
             respone.Message = "Registered successfully!";
             respone.Content = null;
             return respone;
-        }
-
-        public string RetrieveCurrentUserId()
-        {
-            return _httpContextAccessor?.HttpContext?.User.FindFirstValue(ClaimTypes.NameIdentifier);
         }
     }
 }

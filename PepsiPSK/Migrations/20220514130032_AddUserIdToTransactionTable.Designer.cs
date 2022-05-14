@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using PSIShoppingEngine.Data;
@@ -11,9 +12,10 @@ using PSIShoppingEngine.Data;
 namespace PepsiPSK.Migrations
 {
     [DbContext(typeof(DataContext))]
-    partial class DataContextModelSnapshot : ModelSnapshot
+    [Migration("20220514130032_AddUserIdToTransactionTable")]
+    partial class AddUserIdToTransactionTable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -237,6 +239,7 @@ namespace PepsiPSK.Migrations
                         .HasColumnType("uuid");
 
                     b.Property<string>("UserId")
+                        .IsRequired()
                         .HasColumnType("text");
 
                     b.HasKey("Id");
@@ -244,8 +247,6 @@ namespace PepsiPSK.Migrations
                     b.HasIndex("FlowerId");
 
                     b.HasIndex("OrderId");
-
-                    b.HasIndex("UserId");
 
                     b.ToTable("Transactions");
                 });
@@ -400,10 +401,6 @@ namespace PepsiPSK.Migrations
                     b.HasOne("PepsiPSK.Entities.Order", null)
                         .WithMany("Transactions")
                         .HasForeignKey("OrderId");
-
-                    b.HasOne("PepsiPSK.Entities.User", null)
-                        .WithMany("PersonalTransactions")
-                        .HasForeignKey("UserId");
                 });
 
             modelBuilder.Entity("PepsiPSK.Entities.Flower", b =>
@@ -419,8 +416,6 @@ namespace PepsiPSK.Migrations
             modelBuilder.Entity("PepsiPSK.Entities.User", b =>
                 {
                     b.Navigation("FlowersForSelling");
-
-                    b.Navigation("PersonalTransactions");
 
                     b.Navigation("SubmittedOrders");
                 });
