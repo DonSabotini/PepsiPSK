@@ -8,7 +8,6 @@ namespace PepsiPSK.Entities
 
         public Guid OrderId { get; set; }
 
-        [Range(0, int.MaxValue, ErrorMessage = "Amount cannot be negative!")]
         public int Amount { get; set; }
     }
 }
