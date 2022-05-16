@@ -15,5 +15,8 @@ namespace PepsiPSK.Models.Flower
         public string? Description { get; set; }
 
         public string? PhotoLink { get; set; }
+
+        [Range(0, int.MaxValue, ErrorMessage = "Number in stock cannot be negative!")]
+        public int NumberInStock { get; set; }
     }
 }

@@ -20,6 +20,7 @@ namespace PepsiPSK.Services.Flowers
             _currentUserInfoRetriever = currentUserInfoRetriever;
         }
 
+        
         private string GetCurrentUserId()
         {
             return _currentUserInfoRetriever.RetrieveCurrentUserId();
@@ -30,28 +31,28 @@ namespace PepsiPSK.Services.Flowers
             return _currentUserInfoRetriever.CheckIfCurrentUserIsAdmin();
         }
 
-        public async Task<List<Flower>> GetFlowers()
+        public async Task<List<GetFlowerDto>> GetFlowers()
         {
-            return AdminCheck() ? await _context.Flowers.Select(flower => flower).ToListAsync() : await _context.Flowers.Where(f => f.UserId == GetCurrentUserId()).ToListAsync();
+            return AdminCheck() ? await _context.Flowers.Select(flower => _mapper.Map<GetFlowerDto>(flower)).ToListAsync() : await _context.Flowers.Where(f => f.UserId == GetCurrentUserId()).Select(flower => _mapper.Map<GetFlowerDto>(flower)).ToListAsync();
         }
 
-        public async Task<Flower?> GetFlowerById(Guid guid)
+        public async Task<GetFlowerDto?> GetFlowerById(Guid guid)
         {
             var flower = AdminCheck() ? await _context.Flowers.FirstOrDefaultAsync(f => f.Id == guid) : await _context.Flowers.FirstOrDefaultAsync(f => f.Id == guid && f.UserId == GetCurrentUserId());
-            return flower ?? null;
+            return flower != null ? _mapper.Map<GetFlowerDto?>(flower) : null;
         }
 
-        public async Task<Flower> AddFlower(AddFlowerDto addFlowerDto)
+        public async Task<GetFlowerDto> AddFlower(AddFlowerDto addFlowerDto)
         {
             Flower newFlower = _mapper.Map<Flower>(addFlowerDto);
             newFlower.UserId = GetCurrentUserId();
             await _context.Flowers.AddAsync(newFlower);
             await _context.SaveChangesAsync();
             var addedFlower = await _context.Flowers.FirstOrDefaultAsync(f => f.Id == newFlower.Id);
-            return addedFlower;
+            return _mapper.Map<GetFlowerDto>(addedFlower);
         }
 
-        public async Task<Flower?> UpdateFlower(UpdateFlowerDto updateFlowerDto)
+        public async Task<GetFlowerDto?> UpdateFlower(UpdateFlowerDto updateFlowerDto)
         {
             var flower = AdminCheck() ? await _context.Flowers.FirstOrDefaultAsync(f => f.Id == updateFlowerDto.Id) : await _context.Flowers.FirstOrDefaultAsync(f => f.Id == updateFlowerDto.Id && f.UserId == GetCurrentUserId());
 
@@ -62,11 +63,11 @@ namespace PepsiPSK.Services.Flowers
 
             flower.Name = updateFlowerDto.Name;
             flower.Price = updateFlowerDto.Price;
+            flower.NumberInStock = updateFlowerDto.NumberInStock;
             flower.Description = updateFlowerDto.Description;
             _context.Flowers.Update(flower);
             await _context.SaveChangesAsync();
-
-            return flower;
+            return _mapper.Map<GetFlowerDto>(flower);
         }
 
         public async Task<string?> DeleteFlower(Guid guid)

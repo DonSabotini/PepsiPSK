@@ -1,15 +1,13 @@
-﻿using PepsiPSK.Enums;
+﻿using PepsiPSK.Models.FlowerForOrder;
 using System.ComponentModel.DataAnnotations;
 
 namespace PepsiPSK.Models.Order
 {
-    public class UpdateOrderDto
+    public class AddOrderDto
     {
-        public Guid Id { get; set; }
-
         [StringLength(500, ErrorMessage = "Description must not be longer than 500 characters!")]
         public string? Description { get; set; }
 
-        public OrderStatus OrderStatus { get; set; }
+        public List<FlowerForOrderDto> Flowers { get; set; }
     }
 }

@@ -1,6 +1,5 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using PepsiPSK.Entities;
 using PepsiPSK.Models.Order;
 using PepsiPSK.Services.Orders;
 
@@ -33,9 +32,9 @@ namespace PepsiPSK.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> AddOrder(Order order)
+        public async Task<IActionResult> AddOrder(AddOrderDto addOrderDto)
         {
-            var addedOrder = await _orderService.AddOrder(order);
+            var addedOrder = await _orderService.AddOrder(addOrderDto);
             return Ok(addedOrder);
         }
 

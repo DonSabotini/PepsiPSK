@@ -1,14 +1,11 @@
 ﻿using PepsiPSK.Enums;
-using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
 
-namespace PepsiPSK.Entities
+namespace PepsiPSK.Models.Order
 {
-    public class Order
+    public class GetOrderDto
     {
         public Guid Id { get; set; }
 
-        [StringLength(500, ErrorMessage = "Description must not be longer than 500 characters!")]
         public string? Description { get; set; }
 
         public OrderStatus OrderStatus { get; set; } = OrderStatus.Pending;
@@ -17,9 +14,6 @@ namespace PepsiPSK.Entities
 
         public DateTime CreationTime { get; set; } = DateTime.UtcNow;
 
-        public virtual ICollection<Flower> Flowers { get; set; }
-
-        [ForeignKey("User")]
         public string UserId { get; set; }
     }
 }
