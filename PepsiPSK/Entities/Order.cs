@@ -1,6 +1,5 @@
 ﻿using PepsiPSK.Enums;
 using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
 
 namespace PepsiPSK.Entities
 {
@@ -19,7 +18,6 @@ namespace PepsiPSK.Entities
 
         public virtual ICollection<Flower> Flowers { get; set; }
 
-        [ForeignKey("User")]
         public string UserId { get; set; }
     }
 }

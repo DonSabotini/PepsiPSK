@@ -1,7 +1,7 @@
 ﻿using AutoMapper;
 using PepsiPSK.Entities;
 using PepsiPSK.Models.Flower;
-using PepsiPSK.Models.Order;
+using PepsiPSK.Models.User;
 
 namespace PepsiPSK.AutoMapper
 {
@@ -11,7 +11,7 @@ namespace PepsiPSK.AutoMapper
         {
             CreateMap<AddFlowerDto, Flower>();
             CreateMap<Flower, GetFlowerDto>();
-            CreateMap<Order, GetOrderDto>();
+            CreateMap<User, UserInfo>();
         }
     }
 }

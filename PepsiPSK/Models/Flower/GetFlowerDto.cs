@@ -1,4 +1,6 @@
-﻿namespace PepsiPSK.Models.Flower
+﻿using PepsiPSK.Models.User;
+
+namespace PepsiPSK.Models.Flower
 {
     public class GetFlowerDto
     {
@@ -17,5 +19,7 @@
         public DateTime AdditionTime { get; set; } = DateTime.UtcNow;
 
         public string UserId { get; set; }
+
+        public UserInfo UserInfo { get; set; }
     }
 }

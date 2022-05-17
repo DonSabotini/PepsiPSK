@@ -8,5 +8,10 @@ namespace PepsiPSK.Models.FlowerForOrder
 
         [Range(1, int.MaxValue, ErrorMessage = "Amount must be at least one!")]
         public int Amount { get; set; }
+
+        public FlowerForOrderDto()
+        {
+
+        }
     }
 }

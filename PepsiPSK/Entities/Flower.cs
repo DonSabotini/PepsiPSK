@@ -1,6 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
 
 namespace PepsiPSK.Entities
 {
@@ -26,7 +25,6 @@ namespace PepsiPSK.Entities
 
         public virtual ICollection<Order> Orders { get; set; } = new List<Order>();
 
-        [ForeignKey("User")]
         public string UserId { get; set; }
     }
 }
