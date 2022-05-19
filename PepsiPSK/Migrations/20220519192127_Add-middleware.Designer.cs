@@ -12,8 +12,8 @@ using Pepsi.Data;
 namespace PepsiPSK.Migrations
 {
     [DbContext(typeof(DataContext))]
-    [Migration("20220516124023_DomainSimplification")]
-    partial class DomainSimplification
+    [Migration("20220519192127_Add-middleware")]
+    partial class Addmiddleware
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -154,6 +154,26 @@ namespace PepsiPSK.Migrations
                     b.HasKey("UserId", "LoginProvider", "Name");
 
                     b.ToTable("AspNetUserTokens", (string)null);
+                });
+
+            modelBuilder.Entity("PepsiPSK.Entities.ActionRecord", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("UsedMethod")
+                        .HasColumnType("text");
+
+                    b.Property<string>("UserId")
+                        .HasColumnType("text");
+
+                    b.Property<string>("UserName")
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("ActionRecords");
                 });
 
             modelBuilder.Entity("PepsiPSK.Entities.Flower", b =>

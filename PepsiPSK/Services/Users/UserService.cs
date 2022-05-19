@@ -6,7 +6,7 @@ using PepsiPSK.Entities;
 using PepsiPSK.Models.User;
 using PepsiPSK.Responses.Authentication;
 using PepsiPSK.Utils.Authentication;
-using PSIShoppingEngine.Data;
+using Pepsi.Data;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
