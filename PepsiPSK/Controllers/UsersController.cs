@@ -5,16 +5,19 @@ using PepsiPSK.Services.Users;
 
 namespace PepsiPSK.Controllers
 {
+    [Authorize(Roles = "User, Admin")]
     [Route("[controller]")]
     [ApiController]
     public class UsersController : ControllerBase
     {
         private readonly IUserService _userService;
+        
         public UsersController(IUserService userService)
         {
             _userService = userService;
         }
 
+        [AllowAnonymous]
         [HttpPost]
         [Route("login")]
         public async Task<IActionResult> Login([FromBody] LoginDto loginDto)
@@ -34,6 +37,7 @@ namespace PepsiPSK.Controllers
             return Ok(loginResult);
         }
 
+        [AllowAnonymous]
         [HttpPost]
         [Route("register")]
         public async Task<IActionResult> Register([FromBody] RegistrationDto registrationDto)
@@ -48,7 +52,7 @@ namespace PepsiPSK.Controllers
             return Ok(registrationResult);
         }
 
-        [Authorize(Roles = "User, Admin")]
+        [AllowAnonymous]
         [HttpGet]
         public async Task<IActionResult> GetUsers()
         {
@@ -56,7 +60,7 @@ namespace PepsiPSK.Controllers
             return Ok(users);
         }
 
-        [Authorize(Roles = "User, Admin")]
+        [AllowAnonymous]
         [HttpGet]
         [Route("{id}")]
         public async Task<IActionResult> GetUserById(string id)
@@ -68,15 +72,9 @@ namespace PepsiPSK.Controllers
                 return NotFound();
             }
 
-            if (!getResult.IsSuccessful)
-            {
-                return Unauthorized();
-            }
-
             return Ok(getResult);
         }
 
-        [Authorize(Roles = "User, Admin")]
         [HttpPut]
         public async Task<IActionResult> UpdateUser(UpdateUserDto updateUserDto)
         {
@@ -89,13 +87,12 @@ namespace PepsiPSK.Controllers
 
             if (!putResult.IsSuccessful)
             {
-                return Unauthorized();
+                return Unauthorized(putResult);
             }
 
             return Ok(putResult);
         }
 
-        [Authorize(Roles = "User, Admin")]
         [HttpDelete]
         [Route("{id}")]
         public async Task<IActionResult> DeleteUser(string id)
@@ -109,7 +106,7 @@ namespace PepsiPSK.Controllers
 
             if (!deleteResult.IsSuccessful)
             {
-                return Unauthorized();
+                return Unauthorized(deleteResult);
             }
 
             return Ok(deleteResult);

@@ -8,8 +8,6 @@ namespace PepsiPSK.Entities
 
         public string LastName { get; set; }
 
-        public ICollection<Order> Orders { get; set; } = new List<Order>();
-
-        public ICollection<Flower> Flowers{ get; set; } = new List<Flower>();
+        public List<Order> Orders { get; set; } = new List<Order>();
     }
 }

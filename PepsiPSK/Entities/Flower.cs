@@ -23,8 +23,6 @@ namespace PepsiPSK.Entities
 
         public DateTime AdditionTime { get; set; } = DateTime.UtcNow;
 
-        public virtual ICollection<Order> Orders { get; set; } = new List<Order>();
-
-        public string UserId { get; set; }
+        public List<Order> Orders { get; set; } = new List<Order>();
     }
 }

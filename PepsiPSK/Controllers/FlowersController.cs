@@ -5,7 +5,7 @@ using PepsiPSK.Services.Flowers;
 
 namespace PepsiPSK.Controllers
 {
-    [Authorize(Roles ="User, Admin")]
+    [Authorize(Roles = "Admin")]
     [ApiController]
     [Route("[controller]")]
     public class FlowersController : ControllerBase
@@ -17,6 +17,7 @@ namespace PepsiPSK.Controllers
             _flowerService = flowerService;
         }
 
+        [AllowAnonymous]
         [HttpGet]
         public async Task<IActionResult> GetFlowers()
         {
@@ -24,6 +25,7 @@ namespace PepsiPSK.Controllers
             return Ok(flowers);
         }
 
+        [AllowAnonymous]
         [HttpGet("{guid}")]
         public async Task<IActionResult> GetFlowerById(Guid guid)
         {

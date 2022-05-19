@@ -6,6 +6,7 @@ using PepsiPSK.Models.Order;
 using PepsiPSK.Models.User;
 using PepsiPSK.Utils.Authentication;
 using PSIShoppingEngine.Data;
+using System.Security;
 
 namespace PepsiPSK.Services.Orders
 {
@@ -126,47 +127,16 @@ namespace PepsiPSK.Services.Orders
 
         public async Task<GetOrderDto?> GetOrderById(Guid guid)
         {
-            if (AdminCheck())
-            {
-                var orderForAdmin = await _context.Orders.FirstOrDefaultAsync(o => o.Id == guid);
-
-                if (orderForAdmin == null)
-                {
-                    return null;
-                }
-
-                var mappedOrderForAdmin = new GetOrderDto
-                {
-                    Id = orderForAdmin.Id,
-                    Description = orderForAdmin.Description,
-                    OrderStatus = orderForAdmin.OrderStatus,
-                    TotalCost = orderForAdmin.TotalCost,
-                    CreationTime = orderForAdmin.CreationTime,
-                    UserId = orderForAdmin.UserId
-                };
-
-                var flowerForOrderForAdmin = await _context.FlowerOrders.Where(fo => fo.OrderId == mappedOrderForAdmin.Id).ToListAsync();
-
-                for (int i = 0; i < flowerForOrderForAdmin.Count; i++)
-                {
-                    mappedOrderForAdmin.FlowerOrderInfo.Add(new FlowerForOrderDto
-                    {
-                        FlowerId = flowerForOrderForAdmin[i].FlowerId,
-                        Amount = flowerForOrderForAdmin[i].Amount
-                    });
-                }
-
-                var userForAdmin = await _context.Users.FirstOrDefaultAsync(u => u.Id == mappedOrderForAdmin.UserId);
-                mappedOrderForAdmin.UserInfo = _mapper.Map<UserInfo>(userForAdmin);
-
-                return mappedOrderForAdmin;
-            }
-
-            var order = await _context.Orders.FirstOrDefaultAsync(o => o.Id == guid && o.UserId == GetCurrentUserId());
+            var order = await _context.Orders.FirstOrDefaultAsync(o => o.Id == guid);
 
             if (order == null)
             {
                 return null;
+            }
+
+            if (!AdminCheck() || order.UserId != GetCurrentUserId())
+            {
+                throw new SecurityException();
             }
 
             var mappedOrder = new GetOrderDto
@@ -244,54 +214,18 @@ namespace PepsiPSK.Services.Orders
 
         public async Task<GetOrderDto?> UpdateOrder(UpdateOrderDto updateOrderDto)
         {
-            if (AdminCheck())
-            {
-                var orderForAdmin = await _context.Orders.FirstOrDefaultAsync(o => o.Id == updateOrderDto.Id);
-
-                if (orderForAdmin == null)
-                {
-                    return null;
-                }
-
-                orderForAdmin.Description = updateOrderDto.Description;
-                orderForAdmin.OrderStatus = updateOrderDto.OrderStatus;
-
-                var flowerForOrderForAdmin = await _context.FlowerOrders.Where(fo => fo.OrderId == orderForAdmin.Id).ToListAsync();
-
-                var mappedOrderForAdmin = new GetOrderDto
-                {
-                    Id = orderForAdmin.Id,
-                    Description = orderForAdmin.Description,
-                    OrderStatus = orderForAdmin.OrderStatus,
-                    TotalCost = orderForAdmin.TotalCost,
-                    CreationTime = orderForAdmin.CreationTime,
-                    UserId = orderForAdmin.UserId
-                };
-
-                for (int i = 0; i < flowerForOrderForAdmin.Count; i++)
-                {
-                    mappedOrderForAdmin.FlowerOrderInfo.Add(new FlowerForOrderDto
-                    {
-                        FlowerId = flowerForOrderForAdmin[i].FlowerId,
-                        Amount = flowerForOrderForAdmin[i].Amount
-                    });
-                }
-
-                await _context.SaveChangesAsync();
-
-                var userForAdmin = await _context.Users.FirstOrDefaultAsync(u => u.Id == mappedOrderForAdmin.UserId);
-                mappedOrderForAdmin.UserInfo = _mapper.Map<UserInfo>(userForAdmin);
-                return mappedOrderForAdmin;
-            }
-
-            var order = await _context.Orders.FirstOrDefaultAsync(o => o.Id == updateOrderDto.Id && o.UserId == GetCurrentUserId());
+            var order = await _context.Orders.FirstOrDefaultAsync(o => o.Id == updateOrderDto.Id);
 
             if (order == null)
             {
                 return null;
             }
 
-            order.Description = updateOrderDto.Description;
+            if (!AdminCheck() || order.UserId != GetCurrentUserId())
+            {
+                throw new SecurityException();
+            }
+
             order.OrderStatus = updateOrderDto.OrderStatus;
 
             var flowerForOrder = await _context.FlowerOrders.Where(fo => fo.OrderId == order.Id).ToListAsync();
@@ -324,7 +258,7 @@ namespace PepsiPSK.Services.Orders
 
         public async Task<string?> DeleteOrder(Guid guid)
         {
-            var order = AdminCheck() ? await _context.Orders.FirstOrDefaultAsync(o => o.Id == guid) : await _context.Orders.FirstOrDefaultAsync(o => o.Id == guid && o.UserId == GetCurrentUserId());
+            var order = await _context.Orders.FirstOrDefaultAsync(o => o.Id == guid);
 
             if (order == null)
             {
