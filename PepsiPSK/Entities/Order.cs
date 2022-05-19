@@ -16,7 +16,7 @@ namespace PepsiPSK.Entities
 
         public DateTime CreationTime { get; set; } = DateTime.UtcNow;
 
-        public virtual ICollection<Flower> Flowers { get; set; }
+        public virtual List<Flower> Flowers { get; set; }
 
         public string UserId { get; set; }
     }

@@ -201,7 +201,8 @@ namespace PepsiPSK.Services.Orders
             Order newOrder = new();
             newOrder.Description = addOrderDto.Description;
             var flowerIds = addOrderDto.Flowers.Select(f => f.FlowerId).ToList();
-            newOrder.Flowers = await _context.Flowers.Where(flower => flowerIds.Contains(flower.Id)).ToListAsync();
+            var orderedFlowers = await _context.Flowers.Where(flower => flowerIds.Contains(flower.Id)).ToListAsync();
+            newOrder.Flowers = orderedFlowers;
             newOrder.UserId = GetCurrentUserId();
             await _context.Orders.AddAsync(newOrder);
             await _context.SaveChangesAsync();
@@ -218,10 +219,13 @@ namespace PepsiPSK.Services.Orders
                 CreationTime = addedOrder.CreationTime,
                 UserId = addedOrder.UserId
             };
+            
+            decimal totalCost = 0;
 
             for (int i = 0; i < flowerOrders.Count; i++)
             {
                 flowerOrders[i].Amount = addOrderDto.Flowers[i].Amount;
+                totalCost += addedOrder.Flowers[i].Price * flowerOrders[i].Amount;
                 mappedOrder.FlowerOrderInfo.Add(new FlowerForOrderDto
                 {
                     FlowerId = flowerOrders[i].FlowerId,
@@ -229,6 +233,8 @@ namespace PepsiPSK.Services.Orders
                 });
             }
 
+            addedOrder.TotalCost = totalCost;
+            mappedOrder.TotalCost = totalCost;
             var user = await _context.Users.FirstOrDefaultAsync(u => u.Id == mappedOrder.UserId);
             mappedOrder.UserInfo = _mapper.Map<UserInfo>(user);
 
