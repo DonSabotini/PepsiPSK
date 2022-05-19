@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using PSIShoppingEngine.Data;
@@ -11,9 +12,10 @@ using PSIShoppingEngine.Data;
 namespace PepsiPSK.Migrations
 {
     [DbContext(typeof(DataContext))]
-    partial class DataContextModelSnapshot : ModelSnapshot
+    [Migration("20220516124023_DomainSimplification")]
+    partial class DomainSimplification
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -181,7 +183,13 @@ namespace PepsiPSK.Migrations
                         .HasPrecision(6, 2)
                         .HasColumnType("numeric(6,2)");
 
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("text");
+
                     b.HasKey("Id");
+
+                    b.HasIndex("UserId");
 
                     b.ToTable("Flowers");
                 });
@@ -357,6 +365,15 @@ namespace PepsiPSK.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("PepsiPSK.Entities.Flower", b =>
+                {
+                    b.HasOne("PepsiPSK.Entities.User", null)
+                        .WithMany("Flowers")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
             modelBuilder.Entity("PepsiPSK.Entities.FlowerOrder", b =>
                 {
                     b.HasOne("PepsiPSK.Entities.Flower", null)
@@ -383,6 +400,8 @@ namespace PepsiPSK.Migrations
 
             modelBuilder.Entity("PepsiPSK.Entities.User", b =>
                 {
+                    b.Navigation("Flowers");
+
                     b.Navigation("Orders");
                 });
 #pragma warning restore 612, 618

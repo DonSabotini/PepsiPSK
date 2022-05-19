@@ -1,19 +1,32 @@
-﻿using Microsoft.EntityFrameworkCore;
-using PepsiPSK.Model;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
+using PepsiPSK.Entities;
 
 namespace PSIShoppingEngine.Data
 {
-    public class DataContext : DbContext
+    public class DataContext : IdentityDbContext<User>
     {
         public DataContext(DbContextOptions<DataContext> options) : base(options) { }
 
         public DbSet<Flower> Flowers { get; set; }
-        public DbSet<Order> Orders { get; set; }
-        public DbSet<Transaction> Transactions { get; set; }
 
+        public DbSet<Order> Orders { get; set; }
+
+        public DbSet<FlowerOrder> FlowerOrders { get; set; }
+
+        protected override void OnModelCreating(ModelBuilder builder)
+        {
+            builder.Entity<Flower>()
+           .HasMany(f => f.Orders)
+           .WithMany(f => f.Flowers)
+           .UsingEntity<FlowerOrder>(
+               flowerOrder =>
+               {
+                   flowerOrder.Property(fo => fo.Amount);
+                   flowerOrder.HasKey(fo => new { fo.FlowerId, fo.OrderId });
+               });
+
+            base.OnModelCreating(builder);
+        }
     }
 }
