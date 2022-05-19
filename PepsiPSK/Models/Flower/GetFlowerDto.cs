@@ -17,9 +17,5 @@ namespace PepsiPSK.Models.Flower
         public string? PhotoLink { get; set; }
 
         public DateTime AdditionTime { get; set; } = DateTime.UtcNow;
-
-        public string UserId { get; set; }
-
-        public UserInfo UserInfo { get; set; }
     }
 }

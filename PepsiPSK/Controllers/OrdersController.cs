@@ -5,7 +5,6 @@ using PepsiPSK.Services.Orders;
 
 namespace PepsiPSK.Controllers
 {
-    [Authorize(Roles = "User, Admin")]
     [ApiController]
     [Route("[controller]")]
     public class OrdersController : ControllerBase
@@ -17,6 +16,7 @@ namespace PepsiPSK.Controllers
             _orderService = orderService;
         }
 
+        [Authorize(Roles = "User, Admin")]
         [HttpGet]
         public async Task<IActionResult> GetOrders()
         {
@@ -24,6 +24,7 @@ namespace PepsiPSK.Controllers
             return Ok(orders);
         }
 
+        [Authorize(Roles = "User, Admin")]
         [HttpGet("{guid}")]
         public async Task<IActionResult> GetOrderById(Guid guid)
         {
@@ -31,6 +32,7 @@ namespace PepsiPSK.Controllers
             return order == null ? NotFound() : Ok(order);
         }
 
+        [Authorize(Roles = "User, Admin")]
         [HttpPost]
         public async Task<IActionResult> AddOrder(AddOrderDto addOrderDto)
         {
@@ -38,6 +40,7 @@ namespace PepsiPSK.Controllers
             return Ok(addedOrder);
         }
 
+        [Authorize(Roles = "User, Admin")]
         [HttpPut]
         public async Task<IActionResult> UpdateOrder(UpdateOrderDto updateOrderDto)
         {
@@ -45,6 +48,7 @@ namespace PepsiPSK.Controllers
             return order == null ? NotFound() : Ok(order);
         }
 
+        [Authorize(Roles = "Admin")]
         [HttpDelete("{guid}")]
         public async Task<IActionResult> DeleteOrder(Guid guid)
         {

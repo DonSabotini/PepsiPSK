@@ -2,18 +2,20 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
-using Pepsi.Data;
+using PSIShoppingEngine.Data;
 
 #nullable disable
 
 namespace PepsiPSK.Migrations
 {
     [DbContext(typeof(DataContext))]
-    partial class DataContextModelSnapshot : ModelSnapshot
+    [Migration("20220519181447_SimplifiedDomain")]
+    partial class SimplifiedDomain
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -152,32 +154,6 @@ namespace PepsiPSK.Migrations
                     b.HasKey("UserId", "LoginProvider", "Name");
 
                     b.ToTable("AspNetUserTokens", (string)null);
-                });
-
-            modelBuilder.Entity("PepsiPSK.Entities.ActionRecord", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
-
-                    b.Property<string>("Role")
-                        .HasColumnType("text");
-
-                    b.Property<DateTime>("Time")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<string>("UsedMethod")
-                        .HasColumnType("text");
-
-                    b.Property<string>("UserId")
-                        .HasColumnType("text");
-
-                    b.Property<string>("UserName")
-                        .HasColumnType("text");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("ActionRecords");
                 });
 
             modelBuilder.Entity("PepsiPSK.Entities.Flower", b =>

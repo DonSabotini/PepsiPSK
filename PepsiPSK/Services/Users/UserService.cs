@@ -105,6 +105,14 @@ namespace PepsiPSK.Services.Users
                 return respone;
             }
 
+            if (registrationDto.RegistrationPassword != registrationDto.RepeatedRegistrationPassword)
+            {
+                respone.IsSuccessful = false;
+                respone.Message = "Passwords do not match!";
+                respone.Content = null;
+                return respone;
+            }
+
             User user = new()
             {
                 UserName = registrationDto.RegistrationUsername,
@@ -133,7 +141,7 @@ namespace PepsiPSK.Services.Users
         }
 
         public async Task<List<UserInfo>> GetUsers()
-        { 
+        {
             return await _context.Users.Select(user => _mapper.Map<UserInfo>(user)).ToListAsync();
         }
 
@@ -146,11 +154,13 @@ namespace PepsiPSK.Services.Users
                 return null;
             }
 
-            var respone = new AuthenticationResponse();
+            var respone = new AuthenticationResponse
+            {
+                IsSuccessful = true,
+                Message = "User successfully retrieved!",
+                Content = _mapper.Map<UserInfo>(user)
+            };
 
-            respone.IsSuccessful = true;
-            respone.Message = "User retrieved!";
-            respone.Content = _mapper.Map<UserInfo>(user);
             return respone;
         }
 
@@ -167,7 +177,7 @@ namespace PepsiPSK.Services.Users
 
             if (AdminCheck() || updateUserDto.Id == GetCurrentUserId())
             {
-                if (updateUserDto.Password.Equals(updateUserDto.PasswordRepeated))
+                if (updateUserDto.Password.Equals(updateUserDto.RepeatedPassword))
                 {
                     var token = await _userManager.GeneratePasswordResetTokenAsync(user);
                     await _userManager.ResetPasswordAsync(user, token, updateUserDto.Password);
@@ -182,7 +192,7 @@ namespace PepsiPSK.Services.Users
             }
 
             respone.IsSuccessful = false;
-            respone.Message = "Unauthorized!";
+            respone.Message = "You have no rights to perform this operation!";
             respone.Content = null;
             return respone;
         }
@@ -198,8 +208,9 @@ namespace PepsiPSK.Services.Users
 
             var respone = new AuthenticationResponse();
 
-            if (AdminCheck())
+            if (AdminCheck() || id == GetCurrentUserId())
             {
+
                 _context.Users.Remove(user);
                 await _context.SaveChangesAsync();
 
@@ -210,7 +221,7 @@ namespace PepsiPSK.Services.Users
             }
 
             respone.IsSuccessful = false;
-            respone.Message = "Unauthorized!";
+            respone.Message = "You have no rights to perform this operation!";
             respone.Content = null;
             return respone;
         }
