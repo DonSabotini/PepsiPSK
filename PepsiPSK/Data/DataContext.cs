@@ -2,7 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using PepsiPSK.Entities;
 
-namespace PSIShoppingEngine.Data
+namespace Pepsi.Data
 {
     public class DataContext : IdentityDbContext<User>
     {
@@ -13,6 +13,8 @@ namespace PSIShoppingEngine.Data
         public DbSet<Order> Orders { get; set; }
 
         public DbSet<FlowerOrder> FlowerOrders { get; set; }
+        
+        public DbSet<ActionRecord> ActionRecords { get; set; }
 
         protected override void OnModelCreating(ModelBuilder builder)
         {

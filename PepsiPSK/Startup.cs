@@ -2,7 +2,7 @@
 using PepsiPSK.Services.Flowers;
 using PepsiPSK.Services.Orders;
 using PepsiPSK.Utils.Authentication;
-using PSIShoppingEngine.Data;
+using Pepsi.Data;
 using Microsoft.AspNetCore.Identity;
 using PepsiPSK.Entities;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -10,9 +10,6 @@ using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using PepsiPSK.Services.Users;
 using PepsiPSK.Middleware;
-using Microsoft.AspNetCore.Builder;
-using Microsoft.Extensions.DependencyInjection;
-using Autofac;
 
 namespace PepsiPSK
 {
@@ -65,8 +62,8 @@ namespace PepsiPSK
             app.UseRouting();
             app.UseAuthentication();
             app.UseAuthorization();
-            /*if(bool.Parse(Configuration["Middleware"]))
-                app.UseMiddleware<LoggerMiddleware>();*/
+            if (bool.Parse(Configuration["Middleware"]))
+                app.UseMiddleware<LoggerMiddleware>();
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();
