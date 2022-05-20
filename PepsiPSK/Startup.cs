@@ -10,6 +10,9 @@ using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using PepsiPSK.Services.Users;
 using PepsiPSK.Middleware;
+using Newtonsoft.Json.Linq;
+using PepsiPSK.CustomDI;
+using Newtonsoft.Json;
 
 namespace PepsiPSK
 {
@@ -49,12 +52,49 @@ namespace PepsiPSK
             {
                 options.UseNpgsql(Configuration.GetConnectionString("DefaultConnection"));
             });
-            services.AddAutoMapper(typeof(Program));
-            services.AddScoped<IFlowerService, FlowerService>();
-            services.AddScoped<IOrderService, OrderService>();
-            services.AddScoped<IUserService, UserService>();
-            services.AddScoped<ICurrentUserInfoRetriever, CurrentUserInfoRetriever>();
+            services.AddAutoMapper(typeof(Program));   
+            ConfigureJsonServices(services);
+            ConfigureJsonDecorators(services);
+
+
         }
+        private void ConfigureJsonServices(IServiceCollection services)
+        {
+            var jsonServices = JObject.Parse(File.ReadAllText("appSettings.json"))["services"];
+            if (jsonServices == null || jsonServices.Count() == 0)
+                return;
+            var requiredServices = JsonConvert.DeserializeObject<List<Service>>(jsonServices.ToString());
+           
+            foreach (var service in requiredServices)
+            {
+                var ss = new ServiceDescriptor(Type.GetType(service.ServiceType),Type.GetType(service.ImplementationType),service.Lifetime);
+                services.Add(ss);
+            }
+        }
+        private void ConfigureJsonDecorators(IServiceCollection services)
+        {
+            var jsonServices = JObject.Parse(File.ReadAllText("appSettings.json"))["decorators"];
+            if (jsonServices == null || jsonServices.Count() == 0)
+                return;
+            var requiredDecorators = JsonConvert.DeserializeObject<List<Decorator>>(jsonServices.ToString());
+
+            foreach (var decorator in requiredDecorators)
+            {
+                services.Decorate(Type.GetType(decorator.ServiceType), Type.GetType(decorator.DecoratorType));
+            }
+        }
+        private void ConfigureJsonMiddleware(IApplicationBuilder app)
+        {
+            var jsonServices = JObject.Parse(File.ReadAllText("appSettings.json"))["middleware"];
+            if ( jsonServices == null || jsonServices.Count() == 0)
+                return;
+            var requiredMiddleware = JsonConvert.DeserializeObject<List<MiddlewareConfig>>(jsonServices.ToString());
+
+            foreach (var middleware in requiredMiddleware)
+            {
+                app.UseMiddleware(Type.GetType(middleware.ServiceType));
+            }
+        }        
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
 
@@ -62,8 +102,7 @@ namespace PepsiPSK
             app.UseRouting();
             app.UseAuthentication();
             app.UseAuthorization();
-            if (bool.Parse(Configuration["Middleware"]))
-                app.UseMiddleware<LoggerMiddleware>();
+            ConfigureJsonMiddleware(app);
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();
