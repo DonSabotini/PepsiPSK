@@ -11,7 +11,7 @@ namespace PepsiPSK.AutoMapper
         {
             CreateMap<AddFlowerDto, Flower>();
             CreateMap<Flower, GetFlowerDto>();
-            CreateMap<User, UserInfo>();
+            CreateMap<User, UserInfoDto>();
         }
     }
 }

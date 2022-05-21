@@ -15,7 +15,7 @@ namespace PepsiPSK.Models.User
         public string RegistrationPassword { get; set; }
 
         [Required(ErrorMessage = "Repeated password is required!")]
-        public string RepeatedRegistrationPassword { get; set; }
+        public string RegistrationPasswordRepeated { get; set; }
 
         [Required(ErrorMessage = "First name is required!")]
         public string FirstName { get; set; }

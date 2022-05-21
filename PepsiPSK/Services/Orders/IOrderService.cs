@@ -7,7 +7,7 @@ namespace PepsiPSK.Services.Orders
         Task<List<GetOrderDto>> GetOrders();
         Task<GetOrderDto?> GetOrderById(Guid guid);
         Task<GetOrderDto> AddOrder(AddOrderDto addOrderDto);
-        Task<GetOrderDto?> UpdateOrder(UpdateOrderDto updateOrderDto);
+        Task<GetOrderDto?> UpdateOrder(Guid guid, ChangeOrderStatusDto updateOrderDto);
         Task<string?> DeleteOrder(Guid guid);
     }
 }

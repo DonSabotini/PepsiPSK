@@ -105,7 +105,7 @@ namespace PepsiPSK.Services.Users
                 return respone;
             }
 
-            if (registrationDto.RegistrationPassword != registrationDto.RepeatedRegistrationPassword)
+            if (registrationDto.RegistrationPassword != registrationDto.RegistrationPasswordRepeated)
             {
                 respone.IsSuccessful = false;
                 respone.Message = "Passwords do not match!";
@@ -140,9 +140,9 @@ namespace PepsiPSK.Services.Users
             return respone;
         }
 
-        public async Task<List<UserInfo>> GetUsers()
+        public async Task<List<UserInfoDto>> GetUsers()
         {
-            return await _context.Users.Select(user => _mapper.Map<UserInfo>(user)).ToListAsync();
+            return await _context.Users.Select(user => _mapper.Map<UserInfoDto>(user)).ToListAsync();
         }
 
         public async Task<AuthenticationResponse?> GetUserById(string id)
@@ -158,15 +158,48 @@ namespace PepsiPSK.Services.Users
             {
                 IsSuccessful = true,
                 Message = "User successfully retrieved!",
-                Content = _mapper.Map<UserInfo>(user)
+                Content = _mapper.Map<UserInfoDto>(user)
             };
 
             return respone;
         }
 
-        public async Task<AuthenticationResponse?> UpdateUser(UpdateUserDto updateUserDto)
+        public async Task<AuthenticationResponse?> ChangePassword(string id, ChangePasswordDto changePasswordDto)
         {
-            var user = await _context.FindAsync<User>(updateUserDto.Id);
+            var user = await _context.FindAsync<User>(id);
+
+            if (user == null)
+            {
+                return null;
+            }
+
+            var respone = new AuthenticationResponse();
+            bool isCorrectPassword = await _userManager.CheckPasswordAsync(user, changePasswordDto.OldPassword);
+
+            if (AdminCheck() || id == GetCurrentUserId())
+            {
+                if (isCorrectPassword && changePasswordDto.NewPassword.Equals(changePasswordDto.NewPasswordRepeated))
+                {
+                    var token = await _userManager.GeneratePasswordResetTokenAsync(user);
+                    await _userManager.ResetPasswordAsync(user, token, changePasswordDto.NewPassword);
+                    await _context.SaveChangesAsync();
+
+                    respone.IsSuccessful = true;
+                    respone.Message = "Password successfully changed!";
+                    respone.Content = null;
+                    return respone;
+                }
+            }
+
+            respone.IsSuccessful = false;
+            respone.Message = "You have no rights to perform this operation!";
+            respone.Content = null;
+            return respone;
+        }
+
+        public async Task<AuthenticationResponse?> UpdateUserDetails(string id, UpdateUserDetailsDto updateUserDetailsDto)
+        {
+            var user = await _context.FindAsync<User>(id);
 
             if (user == null)
             {
@@ -175,20 +208,15 @@ namespace PepsiPSK.Services.Users
 
             var respone = new AuthenticationResponse();
 
-            if (AdminCheck() || updateUserDto.Id == GetCurrentUserId())
+            if (AdminCheck() || id == GetCurrentUserId())
             {
-                if (updateUserDto.Password.Equals(updateUserDto.RepeatedPassword))
-                {
-                    var token = await _userManager.GeneratePasswordResetTokenAsync(user);
-                    await _userManager.ResetPasswordAsync(user, token, updateUserDto.Password);
-                    user.UserName = updateUserDto.UserName;
-                    await _context.SaveChangesAsync();
+                user.UserName = updateUserDetailsDto.NewUsername;
+                await _context.SaveChangesAsync();
 
-                    respone.IsSuccessful = true;
-                    respone.Message = "User successfully updated!";
-                    respone.Content = _mapper.Map<UserInfo>(user);
-                    return respone;
-                }
+                respone.IsSuccessful = true;
+                respone.Message = "Details successfully updated!";
+                respone.Content = _mapper.Map<UserInfoDto>(user);
+                return respone;
             }
 
             respone.IsSuccessful = false;
@@ -210,7 +238,6 @@ namespace PepsiPSK.Services.Users
 
             if (AdminCheck() || id == GetCurrentUserId())
             {
-
                 _context.Users.Remove(user);
                 await _context.SaveChangesAsync();
 

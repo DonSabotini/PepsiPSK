@@ -8,6 +8,6 @@ namespace PepsiPSK.Models.Order
         [StringLength(500, ErrorMessage = "Description must not be longer than 500 characters!")]
         public string? Description { get; set; }
 
-        public List<FlowerForOrderDto> Flowers { get; set; }
+        public List<AddFlowerForOrderDto> FlowersForOrder { get; set; }
     }
 }

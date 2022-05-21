@@ -10,7 +10,7 @@ namespace PepsiPSK.Entities
         [StringLength(500, ErrorMessage = "Description must not be longer than 500 characters!")]
         public string? Description { get; set; }
 
-        public OrderStatus OrderStatus { get; set; } = OrderStatus.Pending;
+        public OrderStatus OrderStatus { get; set; } = OrderStatus.Submitted;
 
         public decimal TotalCost { get; set; }
 
@@ -19,5 +19,7 @@ namespace PepsiPSK.Entities
         public List<Flower> Flowers { get; set; }
 
         public string UserId { get; set; }
+
+        public DateTime? StatusModificationTime { get; set; }
     }
 }

@@ -5,7 +5,6 @@ namespace PepsiPSK.Models.Flower
 {
     public class UpdateFlowerDto
     {
-        public Guid Id { get; set; }
         public string Name { get; set; }
 
         [Precision(6, 2)]
@@ -16,8 +15,5 @@ namespace PepsiPSK.Models.Flower
         public string? Description { get; set; }
 
         public string? PhotoLink { get; set; }
-
-        [Range(0, int.MaxValue, ErrorMessage = "Number in stock cannot be negative!")]
-        public int NumberInStock { get; set; }
     }
 }

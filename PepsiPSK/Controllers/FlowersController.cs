@@ -40,10 +40,10 @@ namespace PepsiPSK.Controllers
             return Ok(addedFlower);
         }
 
-        [HttpPut]
-        public async Task<IActionResult> UpdateFlower(UpdateFlowerDto flowerDto)
+        [HttpPut("{guid}")]
+        public async Task<IActionResult> UpdateFlower(Guid guid, UpdateFlowerDto updateFlowerDto)
         {
-            var flower = await _flowerService.UpdateFlower(flowerDto);
+            var flower = await _flowerService.UpdateFlower(guid, updateFlowerDto);
             return flower == null ? NotFound() : Ok(flower);
         }
 
@@ -52,6 +52,14 @@ namespace PepsiPSK.Controllers
         {
             var successMessage = await _flowerService.DeleteFlower(guid);
             return successMessage == null ? NotFound() : Ok(successMessage);
+        }
+
+
+        [HttpPut("{guid}/increase-stock")]
+        public async Task<IActionResult> IncreaseStock(Guid guid, IncreaseStockDto increaseStockDto)
+        {
+            var flower = await _flowerService.IncreaseStock(guid, increaseStockDto);
+            return flower == null ? NotFound() : Ok(flower);
         }
     }
 }

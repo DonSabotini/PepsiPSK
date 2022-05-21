@@ -41,10 +41,10 @@ namespace PepsiPSK.Controllers
         }
 
         [Authorize(Roles = "User, Admin")]
-        [HttpPut]
-        public async Task<IActionResult> UpdateOrder(UpdateOrderDto updateOrderDto)
+        [HttpPut("{guid}/change-order-status")]
+        public async Task<IActionResult> UpdateOrder(Guid guid, ChangeOrderStatusDto changeOrderStatusDto)
         {
-            var order = await _orderService.UpdateOrder(updateOrderDto);
+            var order = await _orderService.UpdateOrder(guid, changeOrderStatusDto);
             return order == null ? NotFound() : Ok(order);
         }
 
