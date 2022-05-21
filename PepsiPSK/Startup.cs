@@ -10,6 +10,7 @@ using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using PepsiPSK.Services.Users;
 using PepsiPSK.Middleware;
+using PepsiPSK.Services.Email;
 
 namespace PepsiPSK
 {
@@ -54,6 +55,9 @@ namespace PepsiPSK
             services.AddScoped<IOrderService, OrderService>();
             services.AddScoped<IUserService, UserService>();
             services.AddScoped<ICurrentUserInfoRetriever, CurrentUserInfoRetriever>();
+/*            services.AddScoped<IEmailService, EmailService>();*/
+            services.AddScoped<IEmailService>(x => new EmailService(Configuration["STMPCredentials:email"], Configuration["STMPCredentials:password"]));
+
         }
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {

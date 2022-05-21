@@ -4,6 +4,8 @@ using PepsiPSK.Entities;
 using PepsiPSK.Models.Flower;
 using PepsiPSK.Utils.Authentication;
 using Pepsi.Data;
+using PepsiPSK.Services.Email;
+using PepsiPSK.Constants;
 
 namespace PepsiPSK.Services.Flowers
 {
@@ -12,17 +14,20 @@ namespace PepsiPSK.Services.Flowers
         private readonly DataContext _context;
         private readonly IMapper _mapper;
         private readonly ICurrentUserInfoRetriever _currentUserInfoRetriever;
+        private readonly IEmailService _emailService;
 
-        public FlowerService(DataContext context, IMapper mapper, ICurrentUserInfoRetriever currentUserInfoRetriever)
+        public FlowerService(DataContext context, IMapper mapper, ICurrentUserInfoRetriever currentUserInfoRetriever, IEmailService emailService)
         {
             _context = context;
             _mapper = mapper;
             _currentUserInfoRetriever = currentUserInfoRetriever;
+            _emailService = emailService;
         }
 
         public async Task<List<GetFlowerDto>> GetFlowers()
         {
             var flowers = await _context.Flowers.Select(flower => _mapper.Map<GetFlowerDto>(flower)).ToListAsync();
+            _emailService.sendEmail(new EmailTemplate( "pepsipskteam@gmail.com","kemesis123@gmail.com", 55));
             return flowers;
         }
 
