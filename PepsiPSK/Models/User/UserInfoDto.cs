@@ -1,6 +1,6 @@
 ﻿namespace PepsiPSK.Models.User
 {
-    public class UserInfo
+    public class UserInfoDto
     {
         public string UserName { get; set; }
 

@@ -1,5 +1,4 @@
-﻿using PepsiPSK.Enums;
-using PepsiPSK.Models.FlowerForOrder;
+﻿using PepsiPSK.Models.Flower;
 using PepsiPSK.Models.User;
 
 namespace PepsiPSK.Models.Order
@@ -10,17 +9,17 @@ namespace PepsiPSK.Models.Order
 
         public string? Description { get; set; }
 
-        public OrderStatus OrderStatus { get; set; } = OrderStatus.Pending;
+        public string OrderStatus { get; set; }
 
         public decimal TotalCost { get; set; }
 
-        public DateTime CreationTime { get; set; } = DateTime.UtcNow;
+        public DateTime CreationTime { get; set; }
 
-        public List<FlowerForOrderDto> FlowerOrderInfo { get; set; } = new List<FlowerForOrderDto>();
+        public List<OrderedFlowerInfoDto> OrderedFlowerInfo { get; set; } = new List<OrderedFlowerInfoDto>();
 
         public string UserId { get; set; }
 
-        public UserInfo UserInfo { get; set; }
+        public UserInfoDto UserInfo { get; set; }
 
         public GetOrderDto()
         {

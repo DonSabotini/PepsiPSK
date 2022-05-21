@@ -7,9 +7,10 @@ namespace PepsiPSK.Services.Users
     {
         Task<AuthenticationResponse?> Login(LoginDto loginDto);
         Task<AuthenticationResponse> Register(RegistrationDto registrationDto);
-        Task<List<UserInfo>> GetUsers();
+        Task<List<UserInfoDto>> GetUsers();
         Task<AuthenticationResponse?> GetUserById(string id);
-        Task<AuthenticationResponse?> UpdateUser(UpdateUserDto updateUserDto);
-        Task<AuthenticationResponse?> DeleteUser(string guid);
+        Task<AuthenticationResponse?> ChangePassword(string id, ChangePasswordDto changePasswordDto);
+        Task<AuthenticationResponse?> UpdateUserDetails(string id, UpdateUserDetailsDto updateUserDetailsDto);
+        Task<AuthenticationResponse?> DeleteUser(string id);
     }
 }

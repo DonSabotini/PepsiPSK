@@ -18,8 +18,7 @@ namespace PepsiPSK.Controllers
         }
 
         [AllowAnonymous]
-        [HttpPost]
-        [Route("login")]
+        [HttpPost("login")]
         public async Task<IActionResult> Login([FromBody] LoginDto loginDto)
         {
             var loginResult = await _userService.Login(loginDto);
@@ -38,8 +37,7 @@ namespace PepsiPSK.Controllers
         }
 
         [AllowAnonymous]
-        [HttpPost]
-        [Route("register")]
+        [HttpPost("register")]
         public async Task<IActionResult> Register([FromBody] RegistrationDto registrationDto)
         {
             var registrationResult = await _userService.Register(registrationDto);
@@ -61,8 +59,7 @@ namespace PepsiPSK.Controllers
         }
 
         [AllowAnonymous]
-        [HttpGet]
-        [Route("{id}")]
+        [HttpGet("{id}")]
         public async Task<IActionResult> GetUserById(string id)
         {
             var getResult = await _userService.GetUserById(id);
@@ -75,10 +72,10 @@ namespace PepsiPSK.Controllers
             return Ok(getResult);
         }
 
-        [HttpPut]
-        public async Task<IActionResult> UpdateUser(UpdateUserDto updateUserDto)
+        [HttpPut("{id}/change-password")]
+        public async Task<IActionResult> ChangePassword(string id, ChangePasswordDto changePasswordDto)
         {
-            var putResult = await _userService.UpdateUser(updateUserDto);
+            var putResult = await _userService.ChangePassword(id, changePasswordDto);
 
             if (putResult == null)
             {
@@ -93,8 +90,25 @@ namespace PepsiPSK.Controllers
             return Ok(putResult);
         }
 
-        [HttpDelete]
-        [Route("{id}")]
+        [HttpPut("{id}/update-details")]
+        public async Task<IActionResult> UpdateDetails(string id, UpdateUserDetailsDto updateUserDetailsDto)
+        {
+            var putResult = await _userService.UpdateUserDetails(id, updateUserDetailsDto);
+
+            if (putResult == null)
+            {
+                return NotFound();
+            }
+
+            if (!putResult.IsSuccessful)
+            {
+                return Unauthorized(putResult);
+            }
+
+            return Ok(putResult);
+        }
+
+        [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteUser(string id)
         {
             var deleteResult = await _userService.DeleteUser(id);
