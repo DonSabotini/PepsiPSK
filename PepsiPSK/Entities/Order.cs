@@ -21,5 +21,8 @@ namespace PepsiPSK.Entities
         public string UserId { get; set; }
 
         public DateTime? StatusModificationTime { get; set; }
+
+        [Timestamp]
+        public byte[] Version { get; set; }
     }
 }

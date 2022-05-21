@@ -261,44 +261,51 @@ namespace PepsiPSK.Services.Orders
                 throw new SecurityException();
             }
 
-            order.OrderStatus = updateOrderDto.OrderStatus;
-            order.StatusModificationTime = DateTime.UtcNow;
-
-            var flowerForOrder = await _context.FlowerOrders.Where(fo => fo.OrderId == order.Id).ToListAsync();
-            var flowerIds = flowerForOrder.Select(f => f.FlowerId).ToList();
-            var orderedFlowers = await _context.Flowers.Where(flower => flowerIds.Contains(flower.Id)).ToListAsync();
-
-            var mappedOrder = new GetOrderDto
+            try
             {
-                Id = order.Id,
-                Description = order.Description,
-                OrderStatus = order.OrderStatus.ToString(),
-                TotalCost = order.TotalCost,
-                CreationTime = order.CreationTime,
-                UserId = order.UserId
-            };
+                order.OrderStatus = updateOrderDto.OrderStatus;
+                order.StatusModificationTime = DateTime.UtcNow;
 
-            for (int i = 0; i < flowerForOrder.Count; i++)
-            {
-                mappedOrder.OrderedFlowerInfo.Add(new OrderedFlowerInfoDto
+                var flowerForOrder = await _context.FlowerOrders.Where(fo => fo.OrderId == order.Id).ToListAsync();
+                var flowerIds = flowerForOrder.Select(f => f.FlowerId).ToList();
+                var orderedFlowers = await _context.Flowers.Where(flower => flowerIds.Contains(flower.Id)).ToListAsync();
+
+                var mappedOrder = new GetOrderDto
                 {
-                    FlowerId = orderedFlowers[i].Id,
-                    Name = orderedFlowers[i].Name,
-                    Price = orderedFlowers[i].Price,
-                    PhotoLink = orderedFlowers[i].PhotoLink,
-                    Description = orderedFlowers[i].Description,
-                    Amount = flowerForOrder[i].Amount
-                });
+                    Id = order.Id,
+                    Description = order.Description,
+                    OrderStatus = order.OrderStatus.ToString(),
+                    TotalCost = order.TotalCost,
+                    CreationTime = order.CreationTime,
+                    UserId = order.UserId
+                };
 
-                orderedFlowers[i].NumberInStock += flowerForOrder[i].Amount;
+                for (int i = 0; i < flowerForOrder.Count; i++)
+                {
+                    mappedOrder.OrderedFlowerInfo.Add(new OrderedFlowerInfoDto
+                    {
+                        FlowerId = orderedFlowers[i].Id,
+                        Name = orderedFlowers[i].Name,
+                        Price = orderedFlowers[i].Price,
+                        PhotoLink = orderedFlowers[i].PhotoLink,
+                        Description = orderedFlowers[i].Description,
+                        Amount = flowerForOrder[i].Amount
+                    });
+
+                    orderedFlowers[i].NumberInStock += flowerForOrder[i].Amount;
+                }
+
+                await _context.SaveChangesAsync();
+
+                var user = await _context.Users.FirstOrDefaultAsync(u => u.Id == mappedOrder.UserId);
+                mappedOrder.UserInfo = _mapper.Map<UserInfoDto>(user);
+
+                return mappedOrder;
             }
-
-            await _context.SaveChangesAsync();
-
-            var user = await _context.Users.FirstOrDefaultAsync(u => u.Id == mappedOrder.UserId);
-            mappedOrder.UserInfo = _mapper.Map<UserInfoDto>(user);
-
-            return mappedOrder;
+            catch (DbUpdateConcurrencyException ex)
+            {
+                throw ex;
+            }
         }
 
         public async Task<string?> DeleteOrder(Guid guid)

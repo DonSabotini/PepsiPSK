@@ -178,16 +178,25 @@ namespace PepsiPSK.Services.Users
 
             if (AdminCheck() || id == GetCurrentUserId())
             {
-                if (isCorrectPassword && changePasswordDto.NewPassword.Equals(changePasswordDto.NewPasswordRepeated))
+                try
                 {
-                    var token = await _userManager.GeneratePasswordResetTokenAsync(user);
-                    await _userManager.ResetPasswordAsync(user, token, changePasswordDto.NewPassword);
-                    await _context.SaveChangesAsync();
+                    if (isCorrectPassword && changePasswordDto.NewPassword.Equals(changePasswordDto.NewPasswordRepeated))
+                    {
+                        var token = await _userManager.GeneratePasswordResetTokenAsync(user);
+                        await _userManager.ResetPasswordAsync(user, token, changePasswordDto.NewPassword);
+                        await _context.SaveChangesAsync();
 
-                    respone.IsSuccessful = true;
-                    respone.Message = "Password successfully changed!";
-                    respone.Content = null;
-                    return respone;
+                        respone.IsSuccessful = true;
+                        respone.Message = "Password successfully changed!";
+                        respone.Content = null;
+                        return respone;
+                    }
+                }
+                catch (DbUpdateConcurrencyException ex)
+                {
+                    respone.IsSuccessful = false;
+                    respone.Message = "Update have already been submitted! Please try submitting your entries again!";
+                    respone.Content = ex.Message;
                 }
             }
 
@@ -210,13 +219,22 @@ namespace PepsiPSK.Services.Users
 
             if (AdminCheck() || id == GetCurrentUserId())
             {
-                user.UserName = updateUserDetailsDto.NewUsername;
-                await _context.SaveChangesAsync();
+                try
+                {
+                    user.UserName = updateUserDetailsDto.NewUsername;
+                    await _context.SaveChangesAsync();
 
-                respone.IsSuccessful = true;
-                respone.Message = "Details successfully updated!";
-                respone.Content = _mapper.Map<UserInfoDto>(user);
-                return respone;
+                    respone.IsSuccessful = true;
+                    respone.Message = "Details successfully updated!";
+                    respone.Content = _mapper.Map<UserInfoDto>(user);
+                    return respone;
+                } 
+                catch (DbUpdateConcurrencyException ex)
+                {
+                    respone.IsSuccessful = false;
+                    respone.Message = "Update have already been submitted! Please try submitting your entries again!";
+                    respone.Content = ex.Message;
+                }
             }
 
             respone.IsSuccessful = false;
