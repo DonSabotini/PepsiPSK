@@ -26,5 +26,8 @@ namespace PepsiPSK.Entities
         public List<Order> Orders { get; set; } = new List<Order>();
 
         public DateTime? LastModified { get; set; }
+
+        [Timestamp]
+        public byte[] Version { get; set; }
     }
 }

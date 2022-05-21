@@ -55,14 +55,21 @@ namespace PepsiPSK.Services.Flowers
                 return null;
             }
 
-            flower.Name = updateFlowerDto.Name;
-            flower.Price = updateFlowerDto.Price;
-            flower.Description = updateFlowerDto.Description;
-            flower.LastModified = DateTime.UtcNow;
-            _context.Flowers.Update(flower);
-            await _context.SaveChangesAsync();
-            var mappedFlower = _mapper.Map<GetFlowerDto>(flower);
-            return mappedFlower;
+            try
+            {
+                flower.Name = updateFlowerDto.Name;
+                flower.Price = updateFlowerDto.Price;
+                flower.Description = updateFlowerDto.Description;
+                flower.LastModified = DateTime.UtcNow;
+                _context.Flowers.Update(flower);
+                await _context.SaveChangesAsync();
+                var mappedFlower = _mapper.Map<GetFlowerDto>(flower);
+                return mappedFlower;
+            }
+            catch (DbUpdateConcurrencyException ex)
+            {
+                throw ex;
+            }
         }
 
         public async Task<string?> DeleteFlower(Guid guid)
