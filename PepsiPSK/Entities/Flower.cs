@@ -23,9 +23,11 @@ namespace PepsiPSK.Entities
 
         public DateTime AdditionTime { get; set; } = DateTime.UtcNow;
 
-        public List<Order> Orders { get; set; } = new List<Order>();
+        public List<Order>? Orders { get; set; }
 
         public DateTime? LastModified { get; set; }
+
+        public List<FlowerOrder> FlowerOrders { get; set; }
 
         [Timestamp]
         public byte[] Version { get; set; }

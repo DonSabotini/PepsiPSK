@@ -1,4 +1,5 @@
-﻿using PepsiPSK.Models.FlowerForOrder;
+﻿using PepsiPSK.Enums;
+using PepsiPSK.Models.FlowerForOrder;
 using System.ComponentModel.DataAnnotations;
 
 namespace PepsiPSK.Models.Order
@@ -9,5 +10,9 @@ namespace PepsiPSK.Models.Order
         public string? Description { get; set; }
 
         public List<AddFlowerForOrderDto> FlowersForOrder { get; set; }
+
+        public decimal TotalCost { get; set; }
+
+        public PaymentMethod PaymentMethod { get; set; }
     }
 }

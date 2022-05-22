@@ -21,6 +21,8 @@ namespace PepsiPSK.Models.Order
 
         public UserInfoDto UserInfo { get; set; }
 
+        public string PaymentMethod { get; set; }
+
         public GetOrderDto()
         {
 

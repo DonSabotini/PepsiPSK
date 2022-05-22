@@ -60,6 +60,7 @@ namespace PepsiPSK.Services.Flowers
                 flower.Name = updateFlowerDto.Name;
                 flower.Price = updateFlowerDto.Price;
                 flower.Description = updateFlowerDto.Description;
+                flower.NumberInStock = updateFlowerDto.NumberInStock;
                 flower.LastModified = DateTime.UtcNow;
                 _context.Flowers.Update(flower);
                 await _context.SaveChangesAsync();
@@ -86,7 +87,7 @@ namespace PepsiPSK.Services.Flowers
             return "Successfully deleted!";
         }
 
-        public async Task<GetFlowerDto?> IncreaseStock(Guid guid, IncreaseStockDto increaseStockDto)
+        public async Task<GetFlowerDto?> UpdateStock(Guid guid, UpdateStockDto updateStockDto)
         {
             var flower = await _context.Flowers.FirstOrDefaultAsync(f => f.Id == guid);
 
@@ -95,7 +96,7 @@ namespace PepsiPSK.Services.Flowers
                 return null;
             }
 
-            flower.NumberInStock += increaseStockDto.FlowerAmount;
+            flower.NumberInStock += updateStockDto.FlowerAmount;
             flower.LastModified = DateTime.UtcNow;
             await _context.SaveChangesAsync();
             var mappedFlower = _mapper.Map<GetFlowerDto>(flower);

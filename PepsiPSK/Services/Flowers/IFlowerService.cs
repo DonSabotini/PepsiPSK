@@ -9,6 +9,6 @@ namespace PepsiPSK.Services.Flowers
         Task<GetFlowerDto> AddFlower(AddFlowerDto addFlowerDto);
         Task<GetFlowerDto?> UpdateFlower(Guid guid, UpdateFlowerDto updateFlowerDto);
         Task<string?> DeleteFlower(Guid guid);
-        Task<GetFlowerDto?> IncreaseStock(Guid guid, IncreaseStockDto increaseStockDto);
+        Task<GetFlowerDto?> UpdateStock(Guid guid, UpdateStockDto updateStockDto);
     }
 }

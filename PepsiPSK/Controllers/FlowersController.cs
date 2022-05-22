@@ -55,10 +55,10 @@ namespace PepsiPSK.Controllers
         }
 
 
-        [HttpPut("{guid}/increase-stock")]
-        public async Task<IActionResult> IncreaseStock(Guid guid, IncreaseStockDto increaseStockDto)
+        [HttpPut("{guid}/update-stock")]
+        public async Task<IActionResult> UpdateStock(Guid guid, UpdateStockDto updateStockDto)
         {
-            var flower = await _flowerService.IncreaseStock(guid, increaseStockDto);
+            var flower = await _flowerService.UpdateStock(guid, updateStockDto);
             return flower == null ? NotFound() : Ok(flower);
         }
     }

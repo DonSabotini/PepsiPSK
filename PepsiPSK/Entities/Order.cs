@@ -12,6 +12,8 @@ namespace PepsiPSK.Entities
 
         public OrderStatus OrderStatus { get; set; } = OrderStatus.Submitted;
 
+        public PaymentMethod PaymentMethod { get; set; }
+
         public decimal TotalCost { get; set; }
 
         public DateTime CreationTime { get; set; } = DateTime.UtcNow;
