@@ -14,6 +14,8 @@
 
         public int Amount { get; set; }
 
+        public decimal Cost { get; set; }
+
         public OrderedFlowerInfoDto()
         {
 
