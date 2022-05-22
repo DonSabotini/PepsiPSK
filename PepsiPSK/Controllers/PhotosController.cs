@@ -6,9 +6,9 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using PSIShoppingEngine.Data;
-using PepsiPSK.Model;
-using PepsiPSK.Data.Repositories;
+using PepsiPSK.Entities;
+using PepsiPSK.Models.Photos;
+using PepsiPSK.Services.Photos;
 
 namespace PepsiPSK.Controllers.Photos
 {
@@ -16,25 +16,25 @@ namespace PepsiPSK.Controllers.Photos
     [ApiController]
     public class PhotosController : ControllerBase
     {
-        private readonly PhotoRepository _repository;
+        private readonly PhotoService _service;
 
-        public PhotosController(PhotoRepository repository)
+        public PhotosController(PhotoService service)
         {
-            _repository = repository;
+            _service = service;
         }
 
         // GET: api/Photos
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Photo>>> GetPhotos()
+        public async Task<ActionResult<IEnumerable<PhotoListDto>>> GetPhotos()
         {
-            return await _repository.GetAll();
+            return await _service.GetAll();
         }
 
         // GET: api/Photos/5
         [HttpGet("{id}")]
         public async Task<ActionResult<Photo>> GetPhoto(Guid id)
         {
-            var photo = await _repository.Get(id);
+            var photo = await _service.Get(id);
 
             if (photo == null)
             {
@@ -56,11 +56,12 @@ namespace PepsiPSK.Controllers.Photos
 
             try
             {
-                await _repository.Update(photo);
+                var updatedPhoto = await _service.Update(photo);
+                return updatedPhoto == null ? NotFound() : Ok(updatedPhoto);
             }
             catch (DbUpdateConcurrencyException)
             {
-                if (!_repository.Exists(id))
+                if (!_service.Exists(id))
                 {
                     return NotFound();
                 }
@@ -69,31 +70,28 @@ namespace PepsiPSK.Controllers.Photos
                     throw;
                 }
             }
-
-            return NoContent();
         }
 
         // POST: api/Photos
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        public async Task<ActionResult<Photo>> PostPhoto(Photo photo)
+        public async Task<ActionResult<Photo>> PostPhoto(IFormFile image)
         {
-            await _repository.Add(photo);
-
-            return CreatedAtAction("GetPhoto", new { id = photo.Id }, photo);
+            var photo = await _service.Add(image);
+            return photo == null ? BadRequest() : Ok(photo);
         }
 
         // DELETE: api/Photos/5
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeletePhoto(Guid id)
         {
-            var photo = await _repository.Get(id);
+            var photo = await _service.Get(id);
             if (photo == null)
             {
                 return NotFound();
             }
 
-            _repository.Delete(photo);
+            _service.Delete(photo);
 
             return NoContent();
         }

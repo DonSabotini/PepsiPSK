@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using PepsiPSK.Entities;
+using PepsiPSK.Model;
 
 namespace Pepsi.Data
 {
