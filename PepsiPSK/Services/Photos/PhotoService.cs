@@ -51,14 +51,6 @@ namespace PepsiPSK.Services.Photos
             return null;
         }
 
-        public async Task<Photo?> Update(Photo photo)
-        {
-            _context.Photos.Update(photo);
-            await _context.SaveChangesAsync();
-
-            return photo;
-        }
-
         public void Delete(Photo photo)
         {
             _context.Photos.Remove(photo);

@@ -16,9 +16,9 @@ namespace PepsiPSK.Controllers.Photos
     [ApiController]
     public class PhotosController : ControllerBase
     {
-        private readonly PhotoService _service;
+        private readonly IPhotoService _service;
 
-        public PhotosController(PhotoService service)
+        public PhotosController(IPhotoService service)
         {
             _service = service;
         }
@@ -44,34 +44,6 @@ namespace PepsiPSK.Controllers.Photos
             return photo;
         }
 
-        // PUT: api/Photos/5
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        [HttpPut("{id}")]
-        public async Task<IActionResult> PutPhoto(Guid id, Photo photo)
-        {
-            if (id != photo.Id)
-            {
-                return BadRequest();
-            }
-
-            try
-            {
-                var updatedPhoto = await _service.Update(photo);
-                return updatedPhoto == null ? NotFound() : Ok(updatedPhoto);
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!_service.Exists(id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
-            }
-        }
-
         // POST: api/Photos
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
@@ -93,7 +65,7 @@ namespace PepsiPSK.Controllers.Photos
 
             _service.Delete(photo);
 
-            return NoContent();
+            return Ok();
         }
     }
 }

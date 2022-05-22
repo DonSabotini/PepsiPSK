@@ -10,6 +10,7 @@ using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using PepsiPSK.Services.Users;
 using PepsiPSK.Middleware;
+using PepsiPSK.Services.Photos;
 
 namespace PepsiPSK
 {
@@ -53,6 +54,7 @@ namespace PepsiPSK
             services.AddScoped<IFlowerService, FlowerService>();
             services.AddScoped<IOrderService, OrderService>();
             services.AddScoped<IUserService, UserService>();
+            services.AddScoped<IPhotoService, PhotoService>();
             services.AddScoped<ICurrentUserInfoRetriever, CurrentUserInfoRetriever>();
         }
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)

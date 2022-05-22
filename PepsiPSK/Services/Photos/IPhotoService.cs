@@ -8,7 +8,7 @@ namespace PepsiPSK.Services.Photos
         Task<Photo?> Get(Guid id);
         Task<List<PhotoListDto>> GetAll();
         Task<Photo?> Add(IFormFile image);
-        Task<Photo?> Update(Photo photo);
         void Delete(Photo photo);
+        bool Exists(Guid id);
     }
 }
