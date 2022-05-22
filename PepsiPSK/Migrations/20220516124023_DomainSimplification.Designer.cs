@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using Pepsi.Data;
@@ -11,9 +12,10 @@ using Pepsi.Data;
 namespace PepsiPSK.Migrations
 {
     [DbContext(typeof(DataContext))]
-    partial class DataContextModelSnapshot : ModelSnapshot
+    [Migration("20220516124023_DomainSimplification")]
+    partial class DomainSimplification
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -154,32 +156,6 @@ namespace PepsiPSK.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
-            modelBuilder.Entity("PepsiPSK.Entities.ActionRecord", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
-
-                    b.Property<string>("Role")
-                        .HasColumnType("text");
-
-                    b.Property<DateTime>("Time")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<string>("UsedMethod")
-                        .HasColumnType("text");
-
-                    b.Property<string>("UserId")
-                        .HasColumnType("text");
-
-                    b.Property<string>("UserName")
-                        .HasColumnType("text");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("ActionRecords");
-                });
-
             modelBuilder.Entity("PepsiPSK.Entities.Flower", b =>
                 {
                     b.Property<Guid>("Id")
@@ -192,9 +168,6 @@ namespace PepsiPSK.Migrations
                     b.Property<string>("Description")
                         .HasMaxLength(500)
                         .HasColumnType("character varying(500)");
-
-                    b.Property<DateTime?>("LastModified")
-                        .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -210,13 +183,13 @@ namespace PepsiPSK.Migrations
                         .HasPrecision(6, 2)
                         .HasColumnType("numeric(6,2)");
 
-                    b.Property<byte[]>("Version")
-                        .IsConcurrencyToken()
+                    b.Property<string>("UserId")
                         .IsRequired()
-                        .ValueGeneratedOnAddOrUpdate()
-                        .HasColumnType("bytea");
+                        .HasColumnType("text");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("UserId");
 
                     b.ToTable("Flowers");
                 });
@@ -255,21 +228,12 @@ namespace PepsiPSK.Migrations
                     b.Property<int>("OrderStatus")
                         .HasColumnType("integer");
 
-                    b.Property<DateTime?>("StatusModificationTime")
-                        .HasColumnType("timestamp with time zone");
-
                     b.Property<decimal>("TotalCost")
                         .HasColumnType("numeric");
 
                     b.Property<string>("UserId")
                         .IsRequired()
                         .HasColumnType("text");
-
-                    b.Property<byte[]>("Version")
-                        .IsConcurrencyToken()
-                        .IsRequired()
-                        .ValueGeneratedOnAddOrUpdate()
-                        .HasColumnType("bytea");
 
                     b.HasKey("Id");
 
@@ -338,12 +302,6 @@ namespace PepsiPSK.Migrations
                         .HasMaxLength(256)
                         .HasColumnType("character varying(256)");
 
-                    b.Property<byte[]>("Version")
-                        .IsConcurrencyToken()
-                        .IsRequired()
-                        .ValueGeneratedOnAddOrUpdate()
-                        .HasColumnType("bytea");
-
                     b.HasKey("Id");
 
                     b.HasIndex("NormalizedEmail")
@@ -407,6 +365,15 @@ namespace PepsiPSK.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("PepsiPSK.Entities.Flower", b =>
+                {
+                    b.HasOne("PepsiPSK.Entities.User", null)
+                        .WithMany("Flowers")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
             modelBuilder.Entity("PepsiPSK.Entities.FlowerOrder", b =>
                 {
                     b.HasOne("PepsiPSK.Entities.Flower", null)
@@ -433,6 +400,8 @@ namespace PepsiPSK.Migrations
 
             modelBuilder.Entity("PepsiPSK.Entities.User", b =>
                 {
+                    b.Navigation("Flowers");
+
                     b.Navigation("Orders");
                 });
 #pragma warning restore 612, 618

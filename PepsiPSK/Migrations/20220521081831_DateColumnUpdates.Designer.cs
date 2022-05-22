@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using Pepsi.Data;
@@ -11,9 +12,10 @@ using Pepsi.Data;
 namespace PepsiPSK.Migrations
 {
     [DbContext(typeof(DataContext))]
-    partial class DataContextModelSnapshot : ModelSnapshot
+    [Migration("20220521081831_DateColumnUpdates")]
+    partial class DateColumnUpdates
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -210,12 +212,6 @@ namespace PepsiPSK.Migrations
                         .HasPrecision(6, 2)
                         .HasColumnType("numeric(6,2)");
 
-                    b.Property<byte[]>("Version")
-                        .IsConcurrencyToken()
-                        .IsRequired()
-                        .ValueGeneratedOnAddOrUpdate()
-                        .HasColumnType("bytea");
-
                     b.HasKey("Id");
 
                     b.ToTable("Flowers");
@@ -264,12 +260,6 @@ namespace PepsiPSK.Migrations
                     b.Property<string>("UserId")
                         .IsRequired()
                         .HasColumnType("text");
-
-                    b.Property<byte[]>("Version")
-                        .IsConcurrencyToken()
-                        .IsRequired()
-                        .ValueGeneratedOnAddOrUpdate()
-                        .HasColumnType("bytea");
 
                     b.HasKey("Id");
 
@@ -337,12 +327,6 @@ namespace PepsiPSK.Migrations
                     b.Property<string>("UserName")
                         .HasMaxLength(256)
                         .HasColumnType("character varying(256)");
-
-                    b.Property<byte[]>("Version")
-                        .IsConcurrencyToken()
-                        .IsRequired()
-                        .ValueGeneratedOnAddOrUpdate()
-                        .HasColumnType("bytea");
 
                     b.HasKey("Id");
 

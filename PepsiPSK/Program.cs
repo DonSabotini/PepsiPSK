@@ -1,31 +1,49 @@
 using Microsoft.EntityFrameworkCore;
-using PSIShoppingEngine.Data;
+using PepsiPSK.Services.Flowers;
+using PepsiPSK.Services.Orders;
+using PepsiPSK.Utils.Authentication;
+using Pepsi.Data;
+using Microsoft.AspNetCore.Identity;
+using PepsiPSK.Entities;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
+using PepsiPSK.Services.Users;
+using PepsiPSK.Middleware;
 
-var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
 
-builder.Services.AddControllers();
-builder.Services.AddDbContext<DataContext>(options =>
+namespace PepsiPSK
 {
-    options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection"));
-});
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
-builder.Services.AddEndpointsApiExplorer();
+    public class Program
+    {
+        public static void Main(string[] args)
+        {
+                   
+            var host = Host.CreateDefaultBuilder(args)
+                .ConfigureWebHostDefaults(webHostBuilder => webHostBuilder.UseStartup<Startup>())
+                .Build();
+
+
+            host.Run();
+        }
+
+        /*public static IHostBuilder CreateHostBuilder(string[] args) =>
+            Host.ConfigureServices(services => services.AddAutofac())
+                .ConfigureWebHostDefaults(webBuilder =>
+                {
+                    webBuilder.UseStartup<Startup>();
+                });*/
+    }
+}
+/*var builder = WebApplication.CreateBuilder(args);
+
+ConfigurationManager configuration = builder.Configuration;
 
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
-{
-    
-}
 
-app.UseHttpsRedirection();
 
-app.UseAuthorization();
 
-app.MapControllers();
-
-app.Run();
+app.Run();*/
