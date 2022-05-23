@@ -7,7 +7,7 @@ namespace Pepsi.Data
     public class DataContext : IdentityDbContext<User>
     {
         public DataContext(DbContextOptions<DataContext> options) : base(options) { }
-
+        public DbSet<Photo> Photos { get; set; }
         public DbSet<Flower> Flowers { get; set; }
 
         public DbSet<Order> Orders { get; set; }

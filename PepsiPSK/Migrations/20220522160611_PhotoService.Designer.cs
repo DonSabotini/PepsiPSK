@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using Pepsi.Data;
@@ -11,9 +12,10 @@ using Pepsi.Data;
 namespace PepsiPSK.Migrations
 {
     [DbContext(typeof(DataContext))]
-    partial class DataContextModelSnapshot : ModelSnapshot
+    [Migration("20220522160611_PhotoService")]
+    partial class PhotoService
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -255,9 +257,6 @@ namespace PepsiPSK.Migrations
                     b.Property<int>("OrderStatus")
                         .HasColumnType("integer");
 
-                    b.Property<int>("PaymentMethod")
-                        .HasColumnType("integer");
-
                     b.Property<DateTime?>("StatusModificationTime")
                         .HasColumnType("timestamp with time zone");
 
@@ -436,7 +435,7 @@ namespace PepsiPSK.Migrations
             modelBuilder.Entity("PepsiPSK.Entities.FlowerOrder", b =>
                 {
                     b.HasOne("PepsiPSK.Entities.Flower", null)
-                        .WithMany("FlowerOrders")
+                        .WithMany()
                         .HasForeignKey("FlowerId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -455,11 +454,6 @@ namespace PepsiPSK.Migrations
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-                });
-
-            modelBuilder.Entity("PepsiPSK.Entities.Flower", b =>
-                {
-                    b.Navigation("FlowerOrders");
                 });
 
             modelBuilder.Entity("PepsiPSK.Entities.User", b =>
