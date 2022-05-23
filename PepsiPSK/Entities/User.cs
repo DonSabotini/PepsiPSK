@@ -9,7 +9,7 @@ namespace PepsiPSK.Entities
 
         public string LastName { get; set; }
 
-        public List<Order> Orders { get; set; } = new List<Order>();
+        public List<Order> Orders { get; set; }
 
         [Timestamp]
         public byte[] Version { get; set; }
