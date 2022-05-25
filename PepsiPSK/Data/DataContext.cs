@@ -15,6 +15,7 @@ namespace Pepsi.Data
         public DbSet<FlowerOrder> FlowerOrders { get; set; }
         
         public DbSet<ActionRecord> ActionRecords { get; set; }
+        public DbSet<FlowerItem> FlowerItems { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

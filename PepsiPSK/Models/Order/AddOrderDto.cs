@@ -11,8 +11,6 @@ namespace PepsiPSK.Models.Order
 
         public List<AddFlowerForOrderDto> FlowersForOrder { get; set; }
 
-        public decimal TotalCost { get; set; }
-
         public PaymentMethod PaymentMethod { get; set; }
     }
 }
