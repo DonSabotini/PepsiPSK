@@ -28,7 +28,6 @@ namespace PepsiPSK.Entities
 
         public DateTime? LastModified { get; set; }
 
-        [NotMapped]
         public List<FlowerOrder> FlowerOrders { get; set; }
     }
 }
