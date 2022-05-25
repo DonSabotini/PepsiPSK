@@ -16,9 +16,9 @@ namespace Pepsi.Data
         
         public DbSet<ActionRecord> ActionRecords { get; set; }
 
-        protected override void OnModelCreating(ModelBuilder builder)
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            builder.Entity<Flower>()
+            modelBuilder.Entity<Flower>()
            .HasMany(f => f.Orders)
            .WithMany(f => f.Flowers)
            .UsingEntity<FlowerOrder>(
@@ -28,7 +28,16 @@ namespace Pepsi.Data
                    flowerOrder.HasKey(fo => new { fo.FlowerId, fo.OrderId });
                });
 
-            base.OnModelCreating(builder);
+            modelBuilder.Entity<Flower>()
+                   .UseXminAsConcurrencyToken();
+
+            modelBuilder.Entity<Order>()
+               .UseXminAsConcurrencyToken();
+
+            modelBuilder.Entity<User>()
+               .UseXminAsConcurrencyToken();
+
+            base.OnModelCreating(modelBuilder);
         }
     }
 }
