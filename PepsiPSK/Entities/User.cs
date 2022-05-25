@@ -1,5 +1,4 @@
 ﻿using Microsoft.AspNetCore.Identity;
-using System.ComponentModel.DataAnnotations;
 
 namespace PepsiPSK.Entities
 {
@@ -10,8 +9,5 @@ namespace PepsiPSK.Entities
         public string LastName { get; set; }
 
         public List<Order> Orders { get; set; }
-
-        [Timestamp]
-        public byte[] Version { get; set; }
     }
 }
