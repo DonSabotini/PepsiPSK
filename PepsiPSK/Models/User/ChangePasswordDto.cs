@@ -7,5 +7,7 @@
         public string NewPassword { get; set; }
 
         public string NewPasswordRepeated { get; set; }
+
+        public DateTime? LastModified { get; set; }
     }
 }

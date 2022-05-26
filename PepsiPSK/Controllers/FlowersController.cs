@@ -43,8 +43,19 @@ namespace PepsiPSK.Controllers
         [HttpPut("{guid}")]
         public async Task<IActionResult> UpdateFlower(Guid guid, UpdateFlowerDto updateFlowerDto)
         {
-            var flower = await _flowerService.UpdateFlower(guid, updateFlowerDto);
-            return flower == null ? NotFound() : Ok(flower);
+            var serviceResponse = await _flowerService.UpdateFlower(guid, updateFlowerDto);
+
+            if (serviceResponse.StatusCode == 500 && serviceResponse.IsOptimisticLocking)
+            {
+                return StatusCode(serviceResponse.StatusCode, serviceResponse);
+            }
+
+            if (serviceResponse.StatusCode == 404)
+            {
+                return StatusCode(serviceResponse.StatusCode, serviceResponse);
+            }
+
+            return StatusCode(serviceResponse.StatusCode, serviceResponse);
         }
 
         [HttpDelete("{guid}")]
@@ -58,8 +69,19 @@ namespace PepsiPSK.Controllers
         [HttpPut("{guid}/update-stock")]
         public async Task<IActionResult> UpdateStock(Guid guid, UpdateStockDto updateStockDto)
         {
-            var flower = await _flowerService.UpdateStock(guid, updateStockDto);
-            return flower == null ? NotFound() : Ok(flower);
+            var serviceResponse = await _flowerService.UpdateStock(guid, updateStockDto);
+
+            if (serviceResponse.StatusCode == 500 && serviceResponse.IsOptimisticLocking)
+            {
+                return StatusCode(serviceResponse.StatusCode, serviceResponse);
+            }
+
+            if (serviceResponse.StatusCode == 404)
+            {
+                return StatusCode(serviceResponse.StatusCode, serviceResponse);
+            }
+
+            return StatusCode(serviceResponse.StatusCode, serviceResponse);
         }
     }
 }

@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using Pepsi.Data;
@@ -11,9 +12,10 @@ using Pepsi.Data;
 namespace PepsiPSK.Migrations
 {
     [DbContext(typeof(DataContext))]
-    partial class DataContextModelSnapshot : ModelSnapshot
+    [Migration("20220526150002_AddedLastModifiedToUser")]
+    partial class AddedLastModifiedToUser
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -204,8 +206,8 @@ namespace PepsiPSK.Migrations
                     b.Property<int>("NumberInStock")
                         .HasColumnType("integer");
 
-                    b.Property<Guid?>("PhotoId")
-                        .HasColumnType("uuid");
+                    b.Property<string>("PhotoLink")
+                        .HasColumnType("text");
 
                     b.Property<decimal>("Price")
                         .HasPrecision(6, 2)
@@ -280,12 +282,6 @@ namespace PepsiPSK.Migrations
                     b.Property<string>("Description")
                         .HasMaxLength(500)
                         .HasColumnType("character varying(500)");
-
-                    b.Property<int>("OrderNumber")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("OrderNumber"));
 
                     b.Property<int>("OrderStatus")
                         .HasColumnType("integer");
