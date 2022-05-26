@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using Pepsi.Data;
@@ -11,9 +12,10 @@ using Pepsi.Data;
 namespace PepsiPSK.Migrations
 {
     [DbContext(typeof(DataContext))]
-    partial class DataContextModelSnapshot : ModelSnapshot
+    [Migration("20220526145149_PhotoFlowerRelationship")]
+    partial class PhotoFlowerRelationship
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -218,40 +220,6 @@ namespace PepsiPSK.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Flowers");
-                });
-
-            modelBuilder.Entity("PepsiPSK.Entities.FlowerItem", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
-
-                    b.Property<int>("Amount")
-                        .HasColumnType("integer");
-
-                    b.Property<string>("Description")
-                        .HasMaxLength(500)
-                        .HasColumnType("character varying(500)");
-
-                    b.Property<Guid>("FlowerId")
-                        .HasColumnType("uuid");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<Guid>("OrderId")
-                        .HasColumnType("uuid");
-
-                    b.Property<decimal>("Price")
-                        .HasPrecision(6, 2)
-                        .HasColumnType("numeric(6,2)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("OrderId");
-
-                    b.ToTable("FlowerItems");
                 });
 
             modelBuilder.Entity("PepsiPSK.Entities.FlowerOrder", b =>
@@ -464,15 +432,6 @@ namespace PepsiPSK.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("PepsiPSK.Entities.FlowerItem", b =>
-                {
-                    b.HasOne("PepsiPSK.Entities.Order", null)
-                        .WithMany("Items")
-                        .HasForeignKey("OrderId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
             modelBuilder.Entity("PepsiPSK.Entities.FlowerOrder", b =>
                 {
                     b.HasOne("PepsiPSK.Entities.Flower", null)
@@ -500,11 +459,6 @@ namespace PepsiPSK.Migrations
             modelBuilder.Entity("PepsiPSK.Entities.Flower", b =>
                 {
                     b.Navigation("FlowerOrders");
-                });
-
-            modelBuilder.Entity("PepsiPSK.Entities.Order", b =>
-                {
-                    b.Navigation("Items");
                 });
 
             modelBuilder.Entity("PepsiPSK.Entities.User", b =>

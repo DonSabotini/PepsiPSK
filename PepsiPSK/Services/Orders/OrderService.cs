@@ -1,4 +1,4 @@
-﻿using AutoMapper;
+using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 using PepsiPSK.Entities;
 using PepsiPSK.Models.Order;
@@ -7,7 +7,7 @@ using PepsiPSK.Utils.Authentication;
 using Pepsi.Data;
 using System.Security;
 using PepsiPSK.Enums;
-using PepsiPSK.Models.Flower;
+
 
 namespace PepsiPSK.Services.Orders
 {
@@ -44,17 +44,16 @@ namespace PepsiPSK.Services.Orders
             foreach (var orderedFlower in addOrderDto.FlowersForOrder)
             {
                 Flower flowerFromDB = await _context.Flowers.FirstOrDefaultAsync(f => f.Id == orderedFlower.FlowerId);
-                if (flowerFromDB != null)
-                {
-                    if (flowerFromDB.NumberInStock >= orderedFlower.Amount)
-                    {
-                        FlowerItem item = _mapper.Map<FlowerItem>(flowerFromDB);
-                        flowerFromDB.NumberInStock -= orderedFlower.Amount;
-                        item.Amount = orderedFlower.Amount;
-                        newOrder.Items.Add(item);
-                        newOrder.TotalCost += item.Price * orderedFlower.Amount;
-                    }
-                }                  
+                if (flowerFromDB == null)
+                    throw new ArgumentException("Ordered flower with given id does not exist");
+                if (flowerFromDB.NumberInStock  < orderedFlower.Amount)
+                    throw new ArgumentException("Not enough flowers in stock");
+                FlowerItem item = _mapper.Map<FlowerItem>(flowerFromDB);
+                flowerFromDB.NumberInStock -= orderedFlower.Amount;
+                item.Amount = orderedFlower.Amount;
+                newOrder.Items.Add(item);
+                newOrder.TotalCost += item.Price * orderedFlower.Amount;
+                
             }
             await _context.Orders.AddAsync(newOrder);
             await _context.SaveChangesAsync();
@@ -79,7 +78,7 @@ namespace PepsiPSK.Services.Orders
                 return result;
             }
 
-            var orders = await _context.Orders.Where(o => o.UserId == GetCurrentUserId()).Select(order => order).ToListAsync();
+            var orders = await _context.Orders.Include(x => x.Items).Where(o => o.UserId == GetCurrentUserId()).Select(order => order).ToListAsync();
 
             return _mapper.Map<List<GetOrderDto>>(orders);
         }
@@ -95,8 +94,11 @@ namespace PepsiPSK.Services.Orders
                 throw new SecurityException();
             }
             var result = _mapper.Map<GetOrderDto>(order);
-            User orderUser = await _context.Users.FirstOrDefaultAsync(u => u.Id == order.UserId);
-            result.UserInfo = _mapper.Map<UserInfoDto>(orderUser);
+            if (AdminCheck())
+            {
+                User orderUser = await _context.Users.FirstOrDefaultAsync(u => u.Id == order.UserId);
+                result.UserInfo = _mapper.Map<UserInfoDto>(orderUser);
+            }
             return result;            
         }
  
