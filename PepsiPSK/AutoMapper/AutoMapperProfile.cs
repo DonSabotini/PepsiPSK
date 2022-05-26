@@ -15,7 +15,7 @@ namespace PepsiPSK.AutoMapper
             CreateMap<Flower, GetFlowerDto>();
             CreateMap<User, UserInfoDto>();
             CreateMap<Photo, PhotoListDto>();
-            CreateMap<Order, GetOrderDto>().ForMember(x => x.OrderedFlowerInfo, opt => opt.MapFrom(x => x.Items));
+            CreateMap<Order, GetOrderDto>().ForMember(x => x.OrderedFlowerInfo, opt => opt.MapFrom(x => x.Items)).ForMember(x => x.IdDisplayForUser, opt => opt.MapFrom(x => "Order " + x.CreationTime.ToString("MM/dd/yyyy h:mm tt" + " UTC")));
             CreateMap<AddOrderDto, Order>();
             CreateMap<Flower, FlowerItem>()
                 .ForMember(x => x.Id, opt => opt.Ignore())

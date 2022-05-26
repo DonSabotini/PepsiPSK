@@ -18,5 +18,7 @@ namespace PepsiPSK.Models.Flower
 
         [Range(0, int.MaxValue, ErrorMessage = "Number in stock cannot be negative!")]
         public int NumberInStock { get; set; }
+
+        public DateTime? LastModified { get; set; }
     }
 }

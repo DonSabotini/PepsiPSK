@@ -1,4 +1,5 @@
 ﻿using PepsiPSK.Models.Flower;
+using PepsiPSK.Responses.Service;
 
 namespace PepsiPSK.Services.Flowers
 {
@@ -7,8 +8,8 @@ namespace PepsiPSK.Services.Flowers
         Task<List<GetFlowerDto>> GetFlowers();
         Task<GetFlowerDto?> GetFlowerById(Guid guid);
         Task<GetFlowerDto> AddFlower(AddFlowerDto addFlowerDto);
-        Task<GetFlowerDto?> UpdateFlower(Guid guid, UpdateFlowerDto updateFlowerDto);
+        Task<ServiceResponse<GetFlowerDto?>> UpdateFlower(Guid guid, UpdateFlowerDto updateFlowerDto);
         Task<string?> DeleteFlower(Guid guid);
-        Task<GetFlowerDto?> UpdateStock(Guid guid, UpdateStockDto updateStockDto);
+        Task<ServiceResponse<GetFlowerDto?>> UpdateStock(Guid guid, UpdateStockDto updateStockDto);
     }
 }
