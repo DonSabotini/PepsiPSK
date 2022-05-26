@@ -4,6 +4,7 @@
     {
         Submitted,
         Cancelled,
-        Declined
+        Declined,
+        Finished
     }
 }

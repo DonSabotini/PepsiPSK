@@ -145,8 +145,7 @@ namespace PepsiPSK.Services.Orders
 
                 return serviceResponse;
             }
-
-            if (!OrderStatusValidityCheck(updateOrderDto.OrderStatus, order))
+            if(order.OrderStatus != OrderStatus.Submitted)
             {
                 serviceResponse.Data = null;
                 serviceResponse.StatusCode = 400;
@@ -157,11 +156,25 @@ namespace PepsiPSK.Services.Orders
 
             order.OrderStatus = updateOrderDto.OrderStatus;
 
-            foreach (var item in order.Items)
-            {
-                Flower flower = await _context.Flowers.FirstOrDefaultAsync(f => f.Id == item.FlowerId);
-                if (flower != null)
-                    flower.NumberInStock += item.Amount;
+            switch (updateOrderDto.OrderStatus) {
+                case OrderStatus.Cancelled:
+                    foreach (var item in order.Items)
+                    {
+                        Flower flower = await _context.Flowers.FirstOrDefaultAsync(f => f.Id == item.FlowerId);
+                        if (flower != null)
+                            flower.NumberInStock += item.Amount;
+                    }
+                    break;
+                case OrderStatus.Declined:
+                    foreach (var item in order.Items)
+                    {
+                        Flower flower = await _context.Flowers.FirstOrDefaultAsync(f => f.Id == item.FlowerId);
+                        if (flower != null)
+                            flower.NumberInStock += item.Amount;
+                    }
+                    break;
+                case OrderStatus.Finished:
+                    break;
             }
 
             await _context.SaveChangesAsync();
@@ -195,7 +208,8 @@ namespace PepsiPSK.Services.Orders
         private bool OrderStatusValidityCheck(OrderStatus orderStatus, Order order)
         {
             bool isOrderStatusSubmitted = order.OrderStatus == OrderStatus.Submitted;
-            bool isOperationValid = (orderStatus == OrderStatus.Cancelled && order.UserId == GetCurrentUserId()) || (orderStatus == OrderStatus.Declined && AdminCheck());
+            bool isOperationValid = (orderStatus == OrderStatus.Cancelled && order.UserId == GetCurrentUserId()) 
+                || (orderStatus == OrderStatus.Declined && AdminCheck());
             return isOrderStatusSubmitted && isOperationValid;
         }
     }
