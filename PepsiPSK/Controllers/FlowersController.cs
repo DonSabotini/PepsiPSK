@@ -32,8 +32,7 @@ namespace PepsiPSK.Controllers
             var flower = await _flowerService.GetFlowerById(guid);
             return flower == null ? NotFound() : Ok(flower);
         }
-
-        [AllowAnonymous]
+ 
         [HttpPost]
         public async Task<IActionResult> AddFlower(AddFlowerDto addFlowerDto)
         {
@@ -41,7 +40,6 @@ namespace PepsiPSK.Controllers
             return Ok(addedFlower);
         }
 
-        [AllowAnonymous]
         [HttpPut("{guid}")]
         public async Task<IActionResult> UpdateFlower(Guid guid, UpdateFlowerDto updateFlowerDto)
         {
@@ -49,7 +47,6 @@ namespace PepsiPSK.Controllers
             return flower == null ? NotFound() : Ok(flower);
         }
 
-        [AllowAnonymous]
         [HttpDelete("{guid}")]
         public async Task<IActionResult> DeleteFlower(Guid guid)
         {
