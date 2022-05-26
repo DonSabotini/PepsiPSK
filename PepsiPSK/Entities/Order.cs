@@ -20,6 +20,8 @@ namespace PepsiPSK.Entities
 
         public List<Flower> Flowers { get; set; }
 
+        public List<FlowerItem> Items { get; set; } = new List<FlowerItem>();
+
         public string UserId { get; set; }
 
         public DateTime? StatusModificationTime { get; set; }
