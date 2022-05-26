@@ -19,7 +19,7 @@ namespace PepsiPSK.Entities
         [Range(0, int.MaxValue, ErrorMessage = "Number in stock cannot be negative!")]
         public int NumberInStock { get; set; }
 
-        public string? PhotoLink { get; set; }
+        public Guid? PhotoId { get; set; }
 
         public DateTime AdditionTime { get; set; } = DateTime.UtcNow;
 

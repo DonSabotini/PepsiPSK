@@ -1,4 +1,4 @@
-﻿using AutoMapper;
+using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 using PepsiPSK.Entities;
 using PepsiPSK.Models.Order;
@@ -7,6 +7,7 @@ using PepsiPSK.Utils.Authentication;
 using Pepsi.Data;
 using PepsiPSK.Enums;
 using PepsiPSK.Responses.Service;
+
 
 namespace PepsiPSK.Services.Orders
 {
@@ -80,7 +81,7 @@ namespace PepsiPSK.Services.Orders
                 return result;
             }
 
-            var orders = await _context.Orders.Where(o => o.UserId == GetCurrentUserId()).Select(order => order).ToListAsync();
+            var orders = await _context.Orders.Include(x => x.Items).Where(o => o.UserId == GetCurrentUserId()).Select(order => order).ToListAsync();
 
             return _mapper.Map<List<GetOrderDto>>(orders);
         }
@@ -114,11 +115,13 @@ namespace PepsiPSK.Services.Orders
 
             serviceResponse.Data = result;
             serviceResponse.StatusCode = 200;
-            serviceResponse.IsSuccessful = true;
             serviceResponse.Message = "Order successfully retrieved!";
 
             return serviceResponse;
         }
+ 
+   
+
  
         public async Task<ServiceResponse<GetOrderDto?>> UpdateOrder(Guid guid, ChangeOrderStatusDto updateOrderDto)
         {
