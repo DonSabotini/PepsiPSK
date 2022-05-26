@@ -32,7 +32,7 @@ namespace PepsiPSK.Controllers.Photos
 
         // GET: api/Photos/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<Photo>> GetPhoto(Guid id)
+        public async Task<ActionResult> GetPhoto(Guid id)
         {
             var photo = await _service.Get(id);
 
@@ -40,8 +40,11 @@ namespace PepsiPSK.Controllers.Photos
             {
                 return NotFound();
             }
-
-            return photo;
+            else
+            {
+                var imageData = Convert.FromBase64String(photo.Content);
+                return File(imageData, photo.ContentType);
+            }
         }
 
         // POST: api/Photos

@@ -8,7 +8,7 @@
 
         public decimal Price { get; set; }
 
-        public string? PhotoLink { get; set; }
+        public Guid? PhotoId { get; set; }
 
         public string? Description { get; set; }
 

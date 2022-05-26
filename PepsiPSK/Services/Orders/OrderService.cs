@@ -75,7 +75,7 @@ namespace PepsiPSK.Services.Orders
                             FlowerId = orderedFlowersForAdmin[j].Id,
                             Name = orderedFlowersForAdmin[j].Name,
                             Price = orderedFlowersForAdmin[j].Price,
-                            PhotoLink = orderedFlowersForAdmin[j].PhotoLink,
+                            PhotoId = orderedFlowersForAdmin[j].PhotoId,
                             Description = orderedFlowersForAdmin[j].Description,
                             Amount = flowerAmount,
                             Cost = orderedFlowersForAdmin[j].Price * flowerAmount
@@ -123,7 +123,7 @@ namespace PepsiPSK.Services.Orders
                         FlowerId = orderedFlowers[j].Id,
                         Name = orderedFlowers[j].Name,
                         Price = orderedFlowers[j].Price,
-                        PhotoLink = orderedFlowers[j].PhotoLink,
+                        PhotoId = orderedFlowers[j].PhotoId,
                         Description = orderedFlowers[j].Description,
                         Amount = flowerAmount,
                         Cost = orderedFlowers[j].Price * flowerAmount
@@ -174,7 +174,7 @@ namespace PepsiPSK.Services.Orders
                     FlowerId = orderedFlowers[i].Id,
                     Name = orderedFlowers[i].Name,
                     Price = orderedFlowers[i].Price,
-                    PhotoLink = orderedFlowers[i].PhotoLink,
+                    PhotoId = orderedFlowers[i].PhotoId,
                     Description = orderedFlowers[i].Description,
                     Amount = flowerAmount,
                     Cost = orderedFlowers[i].Price * flowerAmount
@@ -230,7 +230,7 @@ namespace PepsiPSK.Services.Orders
                     FlowerId = orderedFlowers[i].Id,
                     Name = orderedFlowers[i].Name,
                     Price = orderedFlowers[i].Price,
-                    PhotoLink = orderedFlowers[i].PhotoLink,
+                    PhotoId = orderedFlowers[i].PhotoId,
                     Description = orderedFlowers[i].Description,
                     Amount = sortedFlowersForOrder[i].Amount,
                     Cost = orderedFlowers[i].Price * sortedFlowersForOrder[i].Amount
@@ -291,7 +291,7 @@ namespace PepsiPSK.Services.Orders
                         FlowerId = orderedFlowers[i].Id,
                         Name = orderedFlowers[i].Name,
                         Price = orderedFlowers[i].Price,
-                        PhotoLink = orderedFlowers[i].PhotoLink,
+                        PhotoId = orderedFlowers[i].PhotoId,
                         Description = orderedFlowers[i].Description,
                         Amount = flowerAmount,
                         Cost = orderedFlowers[i].Price * flowerAmount
