@@ -152,7 +152,8 @@ namespace PepsiPSK.Services.Orders
         private bool OrderStatusValidityCheck(OrderStatus orderStatus, Order order)
         {
             bool isOrderStatusSubmitted = order.OrderStatus == OrderStatus.Submitted;
-            bool isOperationValid = (orderStatus == OrderStatus.Cancelled && order.UserId == GetCurrentUserId()) || (orderStatus == OrderStatus.Declined && AdminCheck());
+            bool isOperationValid = (orderStatus == OrderStatus.Cancelled && order.UserId == GetCurrentUserId()) 
+                || (orderStatus == OrderStatus.Declined && AdminCheck());
             return isOrderStatusSubmitted && isOperationValid;
         }
     }

@@ -1,11 +1,14 @@
 ﻿using PepsiPSK.Enums;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace PepsiPSK.Entities
 {
     public class Order
     {
         public Guid Id { get; set; }
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+        public int OrderNumber { get; set; }
 
         [StringLength(500, ErrorMessage = "Description must not be longer than 500 characters!")]
         public string? Description { get; set; }

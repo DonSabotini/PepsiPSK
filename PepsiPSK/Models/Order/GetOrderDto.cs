@@ -7,11 +7,15 @@ namespace PepsiPSK.Models.Order
     {
         public Guid Id { get; set; }
 
+        public string OrderNumber { get; set; }
+
         public string? Description { get; set; }
 
         public string OrderStatus { get; set; }
 
         public decimal TotalCost { get; set; }
+
+
 
         public DateTime CreationTime { get; set; }
 
