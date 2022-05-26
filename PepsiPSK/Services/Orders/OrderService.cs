@@ -118,20 +118,36 @@ namespace PepsiPSK.Services.Orders
             {
                 throw new SecurityException();
             }
-
-            if (!OrderStatusValidityCheck(updateOrderDto.OrderStatus, order))
+            if(order.OrderStatus != OrderStatus.Submitted)
             {
                 throw new SecurityException();
             }
             order.OrderStatus = updateOrderDto.OrderStatus;
-            foreach (var item in order.Items)
-            {
-                Flower flower = await _context.Flowers.FirstOrDefaultAsync(f => f.Id == item.FlowerId);
-                if (flower != null)
-                    flower.NumberInStock += item.Amount;
+            switch (updateOrderDto.OrderStatus) {
+                case OrderStatus.Cancelled:
+                    foreach (var item in order.Items)
+                    {
+                        Flower flower = await _context.Flowers.FirstOrDefaultAsync(f => f.Id == item.FlowerId);
+                        if (flower != null)
+                            flower.NumberInStock += item.Amount;
+                    }
+                    break;
+                case OrderStatus.Declined:
+                    foreach (var item in order.Items)
+                    {
+                        Flower flower = await _context.Flowers.FirstOrDefaultAsync(f => f.Id == item.FlowerId);
+                        if (flower != null)
+                            flower.NumberInStock += item.Amount;
+                    }
+                    break;
+                case OrderStatus.Finished:
+                    break;
             }
             await _context.SaveChangesAsync();
             return _mapper.Map<GetOrderDto>(order);
+
+
+
         }
 
         public async Task<string?> DeleteOrder(Guid guid)
