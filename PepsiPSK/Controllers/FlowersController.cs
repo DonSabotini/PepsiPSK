@@ -32,7 +32,7 @@ namespace PepsiPSK.Controllers
             var flower = await _flowerService.GetFlowerById(guid);
             return flower == null ? NotFound() : Ok(flower);
         }
-
+ 
         [HttpPost]
         public async Task<IActionResult> AddFlower(AddFlowerDto addFlowerDto)
         {
