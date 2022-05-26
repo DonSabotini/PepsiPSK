@@ -25,6 +25,8 @@ namespace PepsiPSK.Entities
 
         public List<FlowerItem> Items { get; set; } = new List<FlowerItem>();
 
+        [ConcurrencyCheck]
+        public DateTime? LastModified { get; set; }
         public string UserId { get; set; }
 
         public DateTime? StatusModificationTime { get; set; }

@@ -35,7 +35,7 @@ namespace PepsiPSK.Services.Orders
         }
 
         public async Task<GetOrderDto> AddOrder(AddOrderDto addOrderDto)
-        {
+        {          
             Order newOrder = _mapper.Map<Order>(addOrderDto);
             newOrder.Description = addOrderDto.Description;
             newOrder.PaymentMethod = addOrderDto.PaymentMethod;
@@ -145,17 +145,28 @@ namespace PepsiPSK.Services.Orders
 
                 return serviceResponse;
             }
-            if(order.OrderStatus != OrderStatus.Submitted)
+            if (Nullable.Compare(updateOrderDto.LastModified, order.LastModified) != 0)
+            {
+                serviceResponse.Data = _mapper.Map<GetOrderDto>(order);
+                serviceResponse.StatusCode = 409;
+                serviceResponse.IsOptimisticLocking = true;
+                serviceResponse.Message = $"Order with order number of {order.OrderNumber} has already been updated!";
+
+                return serviceResponse;
+            }
+            if (order.OrderStatus != OrderStatus.Submitted)
             {
                 serviceResponse.Data = null;
                 serviceResponse.StatusCode = 400;
                 serviceResponse.Message = "Cannot update order status to specified value!";
-
+                
                 return serviceResponse;
             }
+            
 
             order.OrderStatus = updateOrderDto.OrderStatus;
-
+            order.LastModified = DateTime.UtcNow;
+            User orderUser = await _context.Users.FirstOrDefaultAsync(u => u.Id == GetCurrentUserId());
             switch (updateOrderDto.OrderStatus) {
                 case OrderStatus.Cancelled:
                     foreach (var item in order.Items)
@@ -178,8 +189,7 @@ namespace PepsiPSK.Services.Orders
             }
 
             await _context.SaveChangesAsync();
-            var result = _mapper.Map<GetOrderDto>(order);
-            User orderUser = await _context.Users.FirstOrDefaultAsync(u => u.Id == GetCurrentUserId());
+            var result = _mapper.Map<GetOrderDto>(order);       
             result.UserInfo = _mapper.Map<UserInfoDto>(orderUser);
 
             serviceResponse.Data = result;
@@ -203,14 +213,6 @@ namespace PepsiPSK.Services.Orders
             await _context.SaveChangesAsync();
 
             return "Successfully deleted!";
-        }
-
-        private bool OrderStatusValidityCheck(OrderStatus orderStatus, Order order)
-        {
-            bool isOrderStatusSubmitted = order.OrderStatus == OrderStatus.Submitted;
-            bool isOperationValid = (orderStatus == OrderStatus.Cancelled && order.UserId == GetCurrentUserId()) 
-                || (orderStatus == OrderStatus.Declined && AdminCheck());
-            return isOrderStatusSubmitted && isOperationValid;
         }
     }
 }

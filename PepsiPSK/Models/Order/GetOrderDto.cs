@@ -15,9 +15,9 @@ namespace PepsiPSK.Models.Order
 
         public decimal TotalCost { get; set; }
 
-
-
         public DateTime CreationTime { get; set; }
+
+        public DateTime? LastModified { get; set; }
 
         public List<OrderedFlowerInfoDto> OrderedFlowerInfo { get; set; } = new List<OrderedFlowerInfoDto>();
 
@@ -26,8 +26,6 @@ namespace PepsiPSK.Models.Order
         public UserInfoDto UserInfo { get; set; }
 
         public string PaymentMethod { get; set; }
-
-        public string IdDisplayForUser { get; set; }
 
         public GetOrderDto()
         {

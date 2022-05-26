@@ -39,6 +39,10 @@ namespace PepsiPSK.Controllers
             {
                 return StatusCode(serviceResponse.StatusCode, serviceResponse);
             }
+            if (serviceResponse.StatusCode == 500 && serviceResponse.IsOptimisticLocking)
+            {
+                return StatusCode(serviceResponse.StatusCode, serviceResponse);
+            }
 
             return StatusCode(serviceResponse.StatusCode, serviceResponse);
         }
