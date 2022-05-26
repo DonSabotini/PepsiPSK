@@ -44,17 +44,17 @@ namespace PepsiPSK.Services.Users
 
         public async Task<AuthenticationResponse?> Login(LoginDto loginDto)
         {
-            var user = await _userManager.FindByEmailAsync(loginDto.LoginEmail);
+            var user = await _userManager.FindByEmailAsync(loginDto.Email);
 
             var respone = new AuthenticationResponse();
 
             if (user == null) return null;
 
-            bool isCorrectPassword = await _userManager.CheckPasswordAsync(user, loginDto.LoginPassword);
+            bool isCorrectPassword = await _userManager.CheckPasswordAsync(user, loginDto.Password);
 
             if (!isCorrectPassword)
             {
-                respone.Message = "Wrong password!";
+                respone.Message = "Wrong credentials!";
                 return respone;
             }
 
@@ -62,14 +62,13 @@ namespace PepsiPSK.Services.Users
 
             var authClaims = new List<Claim>
                 {
-                    new Claim(ClaimTypes.Name, user.UserName),
-                    new Claim(ClaimTypes.NameIdentifier, user.Id),
-                    new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
+                    new Claim("username", user.UserName),
+                    new Claim("id", user.Id),
                 };
 
             foreach (var userRole in userRoles)
             {
-                authClaims.Add(new Claim(ClaimTypes.Role, userRole));
+                authClaims.Add(new Claim("role", userRole));
             }
 
             var authSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["JWT:Secret"]));
@@ -94,7 +93,7 @@ namespace PepsiPSK.Services.Users
         {
             var respone = new AuthenticationResponse();
 
-            var existingUser = await _userManager.FindByNameAsync(registrationDto.RegistrationUsername);
+            var existingUser = await _userManager.FindByNameAsync(registrationDto.Username);
 
             if (existingUser != null)
             {
@@ -102,22 +101,16 @@ namespace PepsiPSK.Services.Users
                 return respone;
             }
 
-            if (registrationDto.RegistrationPassword != registrationDto.RegistrationPasswordRepeated)
-            {
-                respone.Message = "Passwords do not match!";
-                return respone;
-            }
-
             User user = new()
             {
-                UserName = registrationDto.RegistrationUsername,
-                Email = registrationDto.RegistrationEmail,
+                UserName = registrationDto.Username,
+                Email = registrationDto.Email,
                 FirstName = registrationDto.FirstName,
                 LastName = registrationDto.LastName,
                 SecurityStamp = Guid.NewGuid().ToString(),
             };
 
-            var identityResult = await _userManager.CreateAsync(user, registrationDto.RegistrationPassword);
+            var identityResult = await _userManager.CreateAsync(user, registrationDto.Password);
 
             if (!identityResult.Succeeded)
             {
@@ -165,6 +158,7 @@ namespace PepsiPSK.Services.Users
             if (user == null)
             {
                 serviceResponse.Data = null;
+                serviceResponse.StatusCode = 404;
                 serviceResponse.Message = $"User with ID of {id} was not found!";
 
                 return serviceResponse;
@@ -173,6 +167,7 @@ namespace PepsiPSK.Services.Users
             if (Nullable.Compare(changePasswordDto.LastModified, user.LastModified) != 0)
             {
                 serviceResponse.Data = null;
+                serviceResponse.StatusCode = 500;
                 serviceResponse.IsOptimisticLocking = true;
                 serviceResponse.Message = $"User with ID of {id} has already been updated!";
 
@@ -186,6 +181,7 @@ namespace PepsiPSK.Services.Users
             {
                 if (isCorrectPassword && changePasswordDto.NewPassword.Equals(changePasswordDto.NewPasswordRepeated))
                 {
+                    user.LastModified = DateTime.UtcNow;
                     var token = await _userManager.GeneratePasswordResetTokenAsync(user);
                     await _userManager.ResetPasswordAsync(user, token, changePasswordDto.NewPassword);
                     await _context.SaveChangesAsync();
@@ -194,18 +190,26 @@ namespace PepsiPSK.Services.Users
                     respone.Message = "Password successfully changed!";
 
                     serviceResponse.Data = respone;
+                    serviceResponse.StatusCode = 200;
                     serviceResponse.IsSuccessful = true;
                     serviceResponse.Message = $"User with ID of {id} was successfully updated!";
 
                     return serviceResponse;
                 }
+                else
+                {
+                    respone.Message = "Failed to change password!";
+                    serviceResponse.Data = null;
+                    serviceResponse.StatusCode = 400;
+                    serviceResponse.Message = $"Password change failed! Please check your entries!";
 
+                    return serviceResponse;
+                }
             }
 
             respone.Message = "You have no rights to perform this operation!";
-
             serviceResponse.Data = respone;
-            serviceResponse.IsSuccessful = true;
+            serviceResponse.StatusCode = 401;
             serviceResponse.Message = $"Failed to update user with ID of {id}!";
 
             return serviceResponse;
@@ -219,6 +223,7 @@ namespace PepsiPSK.Services.Users
             if (user == null)
             {
                 serviceResponse.Data = null;
+                serviceResponse.StatusCode = 404;
                 serviceResponse.Message = $"User with ID of {id} was not found!";
 
                 return serviceResponse;
@@ -227,6 +232,7 @@ namespace PepsiPSK.Services.Users
             if (Nullable.Compare(updateUserDetailsDto.LastModified, user.LastModified) != 0)
             {
                 serviceResponse.Data = null;
+                serviceResponse.StatusCode = 500;
                 serviceResponse.IsOptimisticLocking = true;
                 serviceResponse.Message = $"User with ID of {id} has already been updated!";
 
@@ -237,7 +243,23 @@ namespace PepsiPSK.Services.Users
 
             if (AdminCheck() || id == GetCurrentUserId())
             {
-                user.UserName = updateUserDetailsDto.NewUsername;
+                user.LastModified = DateTime.UtcNow;
+                
+                if (updateUserDetailsDto.NewUsername != null)
+                {
+                    user.UserName = updateUserDetailsDto.NewUsername;
+                }
+
+                if (updateUserDetailsDto.NewFirstName != null)
+                {
+                    user.FirstName = updateUserDetailsDto.NewFirstName;
+                }
+
+                if (updateUserDetailsDto.NewLastName != null)
+                {
+                    user.LastName = updateUserDetailsDto.NewLastName;
+                }
+
                 await _context.SaveChangesAsync();
 
                 respone.IsSuccessful = true;
@@ -245,6 +267,7 @@ namespace PepsiPSK.Services.Users
                 respone.Content = _mapper.Map<UserInfoDto>(user);
 
                 serviceResponse.Data = respone;
+                serviceResponse.StatusCode = 200;
                 serviceResponse.IsSuccessful = true;
                 serviceResponse.Message = $"User with ID of {id} was successfully updated!";
 
@@ -254,7 +277,7 @@ namespace PepsiPSK.Services.Users
             respone.Message = "You have no rights to perform this operation!";
 
             serviceResponse.Data = respone;
-            serviceResponse.IsSuccessful = true;
+            serviceResponse.StatusCode = 401;
             serviceResponse.Message = $"Failed to update user with ID of {id}!";
 
             return serviceResponse;

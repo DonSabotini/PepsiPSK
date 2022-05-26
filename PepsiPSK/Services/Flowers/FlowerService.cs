@@ -55,6 +55,7 @@ namespace PepsiPSK.Services.Flowers
             if (flower == null)
             {
                 serviceResponse.Data = null;
+                serviceResponse.StatusCode = 404;
                 serviceResponse.Message = $"Flower with ID of {guid} was not found!";
 
                 return serviceResponse;
@@ -63,6 +64,7 @@ namespace PepsiPSK.Services.Flowers
             if (Nullable.Compare(updateFlowerDto.LastModified, flower.LastModified) != 0)
             {
                 serviceResponse.Data = null;
+                serviceResponse.StatusCode = 500;
                 serviceResponse.IsOptimisticLocking = true;
                 serviceResponse.Message = $"Flower with ID of {guid} has already been updated!";
 
@@ -79,6 +81,7 @@ namespace PepsiPSK.Services.Flowers
             var mappedFlower = _mapper.Map<GetFlowerDto>(flower);
 
             serviceResponse.Data = mappedFlower;
+            serviceResponse.StatusCode = 200;
             serviceResponse.IsSuccessful = true;
             serviceResponse.Message = $"Flower with ID of {guid} was successfully updated!";
 
@@ -107,6 +110,7 @@ namespace PepsiPSK.Services.Flowers
             if (flower == null)
             {
                 serviceResponse.Data = null;
+                serviceResponse.StatusCode = 404;
                 serviceResponse.Message = $"Flower with ID of {guid} was not found!";
 
                 return serviceResponse;
@@ -115,7 +119,7 @@ namespace PepsiPSK.Services.Flowers
             if (Nullable.Compare(updateStockDto.LastModified, flower.LastModified) != 0)
             {
                 serviceResponse.Data = null;
-                serviceResponse.IsOptimisticLocking = true;
+                serviceResponse.StatusCode = 500;
                 serviceResponse.Message = $"Flower with ID of {guid} has already been updated!";
 
                 return serviceResponse;
@@ -128,6 +132,7 @@ namespace PepsiPSK.Services.Flowers
 
             serviceResponse.Data = mappedFlower;
             serviceResponse.IsSuccessful = true;
+            serviceResponse.StatusCode = 200;
             serviceResponse.Message = $"Stock of flower with ID of {guid} was successfully updated!";
 
             return serviceResponse;

@@ -45,17 +45,17 @@ namespace PepsiPSK.Controllers
         {
             var serviceResponse = await _flowerService.UpdateFlower(guid, updateFlowerDto);
 
-            if (serviceResponse.IsOptimisticLocking)
+            if (serviceResponse.StatusCode == 500 && serviceResponse.IsOptimisticLocking)
             {
-                return StatusCode(StatusCodes.Status500InternalServerError, serviceResponse);
+                return StatusCode(serviceResponse.StatusCode, serviceResponse);
             }
 
-            if (!serviceResponse.IsSuccessful)
+            if (serviceResponse.StatusCode == 404)
             {
-                return NotFound(serviceResponse);
+                return StatusCode(serviceResponse.StatusCode, serviceResponse);
             }
 
-            return Ok(serviceResponse);
+            return StatusCode(serviceResponse.StatusCode, serviceResponse);
         }
 
         [HttpDelete("{guid}")]
@@ -71,17 +71,17 @@ namespace PepsiPSK.Controllers
         {
             var serviceResponse = await _flowerService.UpdateStock(guid, updateStockDto);
 
-            if (serviceResponse.IsOptimisticLocking)
+            if (serviceResponse.StatusCode == 500 && serviceResponse.IsOptimisticLocking)
             {
-                return StatusCode(StatusCodes.Status500InternalServerError, serviceResponse);
+                return StatusCode(serviceResponse.StatusCode, serviceResponse);
             }
 
-            if (!serviceResponse.IsSuccessful)
+            if (serviceResponse.StatusCode == 404)
             {
-                return NotFound(serviceResponse);
+                return StatusCode(serviceResponse.StatusCode, serviceResponse);
             }
 
-            return Ok(serviceResponse);
+            return StatusCode(serviceResponse.StatusCode, serviceResponse);
         }
     }
 }

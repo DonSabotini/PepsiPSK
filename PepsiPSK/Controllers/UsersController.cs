@@ -23,14 +23,9 @@ namespace PepsiPSK.Controllers
         {
             var loginResult = await _userService.Login(loginDto);
 
-            if (loginResult == null)
+            if (loginResult == null || !loginResult.IsSuccessful)
             {
-                return NotFound();
-            }
-
-            if(!loginResult.IsSuccessful)
-            {
-                return BadRequest(loginResult);
+                return NotFound(loginResult);
             }
 
             return Ok(loginResult);
@@ -77,22 +72,22 @@ namespace PepsiPSK.Controllers
         {
             var serviceResponse = await _userService.ChangePassword(id, changePasswordDto);
 
-            if (serviceResponse.IsOptimisticLocking)
+            if (serviceResponse.StatusCode == 500 && serviceResponse.IsOptimisticLocking)
             {
-                return StatusCode(StatusCodes.Status500InternalServerError, serviceResponse);
+                return StatusCode(serviceResponse.StatusCode, serviceResponse);
             }
 
-            if (!serviceResponse.IsSuccessful)
+            if (serviceResponse.StatusCode == 404)
             {
-                return NotFound(serviceResponse);
+                return StatusCode(serviceResponse.StatusCode, serviceResponse);
             }
 
-            if (!serviceResponse.Data.IsSuccessful)
+            if (serviceResponse.StatusCode == 401)
             {
-                return Unauthorized(serviceResponse.Data);
+                return StatusCode(serviceResponse.StatusCode, serviceResponse);
             }
 
-            return Ok(serviceResponse);
+            return StatusCode(serviceResponse.StatusCode, serviceResponse);
         }
 
         [HttpPut("{id}/update-details")]
@@ -100,22 +95,17 @@ namespace PepsiPSK.Controllers
         {
             var serviceResponse = await _userService.UpdateUserDetails(id, updateUserDetailsDto);
 
-            if (serviceResponse.IsOptimisticLocking)
+            if (serviceResponse.StatusCode == 500 && serviceResponse.IsOptimisticLocking)
             {
-                return StatusCode(StatusCodes.Status500InternalServerError, serviceResponse);
+                return StatusCode(serviceResponse.StatusCode, serviceResponse);
             }
 
-            if (!serviceResponse.IsSuccessful)
+            if (serviceResponse.StatusCode == 404)
             {
-                return NotFound(serviceResponse);
+                return StatusCode(serviceResponse.StatusCode, serviceResponse);
             }
 
-            if (!serviceResponse.Data.IsSuccessful)
-            {
-                return Unauthorized(serviceResponse.Data);
-            }
-
-            return Ok(serviceResponse);
+            return StatusCode(serviceResponse.StatusCode, serviceResponse);
         }
 
         [HttpDelete("{id}")]
