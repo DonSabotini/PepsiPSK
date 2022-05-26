@@ -59,11 +59,16 @@ namespace PepsiPSK
         }
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
-
+            app.UseCors(x => x
+                .AllowAnyMethod()
+                .AllowAnyHeader()
+                .SetIsOriginAllowed(origin => true)
+                .AllowCredentials());
             app.UseHttpsRedirection();
             app.UseRouting();
             app.UseAuthentication();
             app.UseAuthorization();
+            
             if (bool.Parse(Configuration["Middleware"]))
                 app.UseMiddleware<LoggerMiddleware>();
             app.UseEndpoints(endpoints =>
