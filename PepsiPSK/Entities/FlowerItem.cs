@@ -1,12 +1,14 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace PepsiPSK.Entities
 {
-    public class Flower
+    public class FlowerItem
     {
         public Guid Id { get; set; }
 
+        public Guid FlowerId { get; set; }
         public string Name { get; set; }
 
         [Precision(6, 2)]
@@ -15,19 +17,9 @@ namespace PepsiPSK.Entities
 
         [StringLength(500, ErrorMessage = "Description must not be longer than 500 characters!")]
         public string? Description { get; set; }
-
-        [Range(0, int.MaxValue, ErrorMessage = "Number in stock cannot be negative!")]
-        public int NumberInStock { get; set; }
-
-        public string? PhotoLink { get; set; }
-
-        public DateTime AdditionTime { get; set; } = DateTime.UtcNow;
-
-        public List<Order> Orders { get; set; }
-
-        [ConcurrencyCheck]
-        public DateTime? LastModified { get; set; }
-
-        public List<FlowerOrder> FlowerOrders { get; set; }
+        
+        [Range(1, int.MaxValue, ErrorMessage = "Amount must be at least one!")]
+        public int Amount { get; set; }
+        public Guid OrderId { get; set; }
     }
 }

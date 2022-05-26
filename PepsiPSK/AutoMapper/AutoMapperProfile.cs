@@ -3,6 +3,7 @@ using PepsiPSK.Entities;
 using PepsiPSK.Models.Flower;
 using PepsiPSK.Models.Photos;
 using PepsiPSK.Models.User;
+using PepsiPSK.Models.Order;
 
 namespace PepsiPSK.AutoMapper
 {
@@ -14,6 +15,13 @@ namespace PepsiPSK.AutoMapper
             CreateMap<Flower, GetFlowerDto>();
             CreateMap<User, UserInfoDto>();
             CreateMap<Photo, PhotoListDto>();
+            CreateMap<Order, GetOrderDto>().ForMember(x => x.OrderedFlowerInfo, opt => opt.MapFrom(x => x.Items));
+            CreateMap<AddOrderDto, Order>();
+            CreateMap<Flower, FlowerItem>()
+                .ForMember(x => x.Id, opt => opt.Ignore())
+                .ForMember(x => x.OrderId, opt => opt.Ignore())
+                .ForMember(x => x.FlowerId, opt => opt.MapFrom(x => x.Id));
+            CreateMap<FlowerItem, OrderedFlowerInfoDto>();
         }
     }
 }
