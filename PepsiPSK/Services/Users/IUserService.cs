@@ -1,5 +1,6 @@
 ﻿using PepsiPSK.Models.User;
 using PepsiPSK.Responses.Authentication;
+using PepsiPSK.Responses.Service;
 
 namespace PepsiPSK.Services.Users
 {
@@ -9,8 +10,8 @@ namespace PepsiPSK.Services.Users
         Task<AuthenticationResponse> Register(RegistrationDto registrationDto);
         Task<List<UserInfoDto>> GetUsers();
         Task<AuthenticationResponse?> GetUserById(string id);
-        Task<AuthenticationResponse?> ChangePassword(string id, ChangePasswordDto changePasswordDto);
-        Task<AuthenticationResponse?> UpdateUserDetails(string id, UpdateUserDetailsDto updateUserDetailsDto);
+        Task<ServiceResponse<AuthenticationResponse?>> ChangePassword(string id, ChangePasswordDto changePasswordDto);
+        Task<ServiceResponse<AuthenticationResponse?>> UpdateUserDetails(string id, UpdateUserDetailsDto updateUserDetailsDto);
         Task<AuthenticationResponse?> DeleteUser(string id);
     }
 }

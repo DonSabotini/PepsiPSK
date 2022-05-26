@@ -28,15 +28,6 @@ namespace Pepsi.Data
                    flowerOrder.HasKey(fo => new { fo.FlowerId, fo.OrderId });
                });
 
-            modelBuilder.Entity<Flower>()
-                   .UseXminAsConcurrencyToken();
-
-            modelBuilder.Entity<Order>()
-               .UseXminAsConcurrencyToken();
-
-            modelBuilder.Entity<User>()
-               .UseXminAsConcurrencyToken();
-
             base.OnModelCreating(modelBuilder);
         }
     }

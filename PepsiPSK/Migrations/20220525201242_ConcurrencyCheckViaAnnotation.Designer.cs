@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using Pepsi.Data;
@@ -11,9 +12,10 @@ using Pepsi.Data;
 namespace PepsiPSK.Migrations
 {
     [DbContext(typeof(DataContext))]
-    partial class DataContextModelSnapshot : ModelSnapshot
+    [Migration("20220525201242_ConcurrencyCheckViaAnnotation")]
+    partial class ConcurrencyCheckViaAnnotation
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -177,7 +179,7 @@ namespace PepsiPSK.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("ActionRecords", (string)null);
+                    b.ToTable("ActionRecords");
                 });
 
             modelBuilder.Entity("PepsiPSK.Entities.Flower", b =>
@@ -217,7 +219,7 @@ namespace PepsiPSK.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Flowers", (string)null);
+                    b.ToTable("Flowers");
                 });
 
             modelBuilder.Entity("PepsiPSK.Entities.FlowerOrder", b =>
@@ -235,7 +237,7 @@ namespace PepsiPSK.Migrations
 
                     b.HasIndex("OrderId");
 
-                    b.ToTable("FlowerOrders", (string)null);
+                    b.ToTable("FlowerOrders");
                 });
 
             modelBuilder.Entity("PepsiPSK.Entities.Order", b =>
@@ -276,7 +278,7 @@ namespace PepsiPSK.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Orders", (string)null);
+                    b.ToTable("Orders");
                 });
 
             modelBuilder.Entity("PepsiPSK.Entities.Photo", b =>
@@ -299,7 +301,7 @@ namespace PepsiPSK.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Photos", (string)null);
+                    b.ToTable("Photos");
                 });
 
             modelBuilder.Entity("PepsiPSK.Entities.User", b =>
@@ -433,7 +435,7 @@ namespace PepsiPSK.Migrations
             modelBuilder.Entity("PepsiPSK.Entities.FlowerOrder", b =>
                 {
                     b.HasOne("PepsiPSK.Entities.Flower", null)
-                        .WithMany()
+                        .WithMany("FlowerOrders")
                         .HasForeignKey("FlowerId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -452,6 +454,11 @@ namespace PepsiPSK.Migrations
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+                });
+
+            modelBuilder.Entity("PepsiPSK.Entities.Flower", b =>
+                {
+                    b.Navigation("FlowerOrders");
                 });
 
             modelBuilder.Entity("PepsiPSK.Entities.User", b =>

@@ -75,37 +75,47 @@ namespace PepsiPSK.Controllers
         [HttpPut("{id}/change-password")]
         public async Task<IActionResult> ChangePassword(string id, ChangePasswordDto changePasswordDto)
         {
-            var putResult = await _userService.ChangePassword(id, changePasswordDto);
+            var serviceResponse = await _userService.ChangePassword(id, changePasswordDto);
 
-            if (putResult == null)
+            if (serviceResponse.IsOptimisticLocking)
             {
-                return NotFound();
+                return StatusCode(StatusCodes.Status500InternalServerError, serviceResponse);
             }
 
-            if (!putResult.IsSuccessful)
+            if (!serviceResponse.IsSuccessful)
             {
-                return Unauthorized(putResult);
+                return NotFound(serviceResponse);
             }
 
-            return Ok(putResult);
+            if (!serviceResponse.Data.IsSuccessful)
+            {
+                return Unauthorized(serviceResponse.Data);
+            }
+
+            return Ok(serviceResponse);
         }
 
         [HttpPut("{id}/update-details")]
         public async Task<IActionResult> UpdateDetails(string id, UpdateUserDetailsDto updateUserDetailsDto)
         {
-            var putResult = await _userService.UpdateUserDetails(id, updateUserDetailsDto);
+            var serviceResponse = await _userService.UpdateUserDetails(id, updateUserDetailsDto);
 
-            if (putResult == null)
+            if (serviceResponse.IsOptimisticLocking)
             {
-                return NotFound();
+                return StatusCode(StatusCodes.Status500InternalServerError, serviceResponse);
             }
 
-            if (!putResult.IsSuccessful)
+            if (!serviceResponse.IsSuccessful)
             {
-                return Unauthorized(putResult);
+                return NotFound(serviceResponse);
             }
 
-            return Ok(putResult);
+            if (!serviceResponse.Data.IsSuccessful)
+            {
+                return Unauthorized(serviceResponse.Data);
+            }
+
+            return Ok(serviceResponse);
         }
 
         [HttpDelete("{id}")]

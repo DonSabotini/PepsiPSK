@@ -1,6 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
 
 namespace PepsiPSK.Entities
 {
@@ -26,6 +25,7 @@ namespace PepsiPSK.Entities
 
         public List<Order> Orders { get; set; }
 
+        [ConcurrencyCheck]
         public DateTime? LastModified { get; set; }
 
         [NotMapped]
