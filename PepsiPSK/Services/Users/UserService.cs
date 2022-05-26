@@ -44,7 +44,7 @@ namespace PepsiPSK.Services.Users
 
         public async Task<AuthenticationResponse?> Login(LoginDto loginDto)
         {
-            var user = await _userManager.FindByEmailAsync(loginDto.Email);
+            var user = await _userManager.FindByNameAsync(loginDto.Username);
 
             var respone = new AuthenticationResponse();
 
