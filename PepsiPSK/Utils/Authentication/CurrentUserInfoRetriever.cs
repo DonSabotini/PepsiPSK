@@ -14,7 +14,7 @@ namespace PepsiPSK.Utils.Authentication
 
         public string RetrieveCurrentUserId()
         {
-            return _httpContextAccessor.HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier);
+            return _httpContextAccessor.HttpContext.User.FindFirstValue("id");
         }
 
         public bool CheckIfCurrentUserIsAdmin()

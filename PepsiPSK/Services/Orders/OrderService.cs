@@ -7,7 +7,8 @@ using PepsiPSK.Utils.Authentication;
 using Pepsi.Data;
 using PepsiPSK.Enums;
 using PepsiPSK.Responses.Service;
-
+using PepsiPSK.Services.Email;
+using PepsiPSK.Constants;
 
 namespace PepsiPSK.Services.Orders
 {
@@ -16,12 +17,14 @@ namespace PepsiPSK.Services.Orders
         private readonly DataContext _context;
         private readonly IMapper _mapper;
         private readonly ICurrentUserInfoRetriever _currentUserInfoRetriever;
+        private readonly IEmailService _emailService;
 
-        public OrderService(DataContext context, IMapper mapper, ICurrentUserInfoRetriever currentUserInfoRetriever)
+        public OrderService(DataContext context, IMapper mapper, ICurrentUserInfoRetriever currentUserInfoRetriever, IEmailService emailService)
         {
             _context = context;
             _mapper = mapper;
             _currentUserInfoRetriever = currentUserInfoRetriever;
+            _emailService = emailService;
         }
 
         private string GetCurrentUserId()
@@ -46,17 +49,19 @@ namespace PepsiPSK.Services.Orders
             {
                 Flower flowerFromDB = await _context.Flowers.FirstOrDefaultAsync(f => f.Id == orderedFlower.FlowerId);
 
-                if (flowerFromDB != null)
+                if (flowerFromDB == null)
                 {
-                    if (flowerFromDB.NumberInStock >= orderedFlower.Amount)
-                    {
-                        FlowerItem item = _mapper.Map<FlowerItem>(flowerFromDB);
-                        flowerFromDB.NumberInStock -= orderedFlower.Amount;
-                        item.Amount = orderedFlower.Amount;
-                        newOrder.Items.Add(item);
-                        newOrder.TotalCost += item.Price * orderedFlower.Amount;
-                    }
-                }                  
+                    throw new InvalidDataException("Flower with given id does not exist");
+                }
+                if (flowerFromDB.NumberInStock < orderedFlower.Amount)
+                {
+                    throw new InvalidDataException("Flower amount to low");
+                }
+                FlowerItem item = _mapper.Map<FlowerItem>(flowerFromDB);
+                flowerFromDB.NumberInStock -= orderedFlower.Amount;
+                item.Amount = orderedFlower.Amount;
+                newOrder.Items.Add(item);
+                newOrder.TotalCost += item.Price * orderedFlower.Amount;
             }
 
             await _context.Orders.AddAsync(newOrder);
@@ -64,6 +69,7 @@ namespace PepsiPSK.Services.Orders
             var result = _mapper.Map<GetOrderDto>(newOrder);
             User orderUser = await _context.Users.FirstOrDefaultAsync(u => u.Id == newOrder.UserId);
             result.UserInfo = _mapper.Map<UserInfoDto>(orderUser);
+            _emailService.sendEmail(new CreateOrderEmailTemplate(orderUser.Email, newOrder));
             return result;
         }
         
@@ -174,7 +180,9 @@ namespace PepsiPSK.Services.Orders
                         Flower flower = await _context.Flowers.FirstOrDefaultAsync(f => f.Id == item.FlowerId);
                         if (flower != null)
                             flower.NumberInStock += item.Amount;
+                        
                     }
+                    _emailService.sendEmail(new CancelledOrderEmailTemplate(orderUser.Email, order));
                     break;
                 case OrderStatus.Declined:
                     foreach (var item in order.Items)
@@ -182,9 +190,12 @@ namespace PepsiPSK.Services.Orders
                         Flower flower = await _context.Flowers.FirstOrDefaultAsync(f => f.Id == item.FlowerId);
                         if (flower != null)
                             flower.NumberInStock += item.Amount;
+                        
                     }
+                    _emailService.sendEmail(new DeclinedOrderEmailTemplate(orderUser.Email, order));
                     break;
                 case OrderStatus.Finished:
+                    _emailService.sendEmail(new FinishedOrderEmailTemplate(orderUser.Email, order));
                     break;
             }
 

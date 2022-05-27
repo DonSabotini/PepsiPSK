@@ -11,6 +11,7 @@ using System.Text;
 using PepsiPSK.Services.Users;
 using PepsiPSK.Middleware;
 using PepsiPSK.Services.Photos;
+using PepsiPSK.Services.Email;
 
 namespace PepsiPSK
 {
@@ -56,6 +57,7 @@ namespace PepsiPSK
             services.AddScoped<IUserService, UserService>();
             services.AddScoped<IPhotoService, PhotoService>();
             services.AddScoped<ICurrentUserInfoRetriever, CurrentUserInfoRetriever>();
+            services.AddScoped<IEmailService>(x => new EmailService(Configuration["STMPCredentials:email"], Configuration["STMPCredentials:password"]));
         }
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
