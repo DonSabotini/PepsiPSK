@@ -9,7 +9,7 @@ namespace PepsiPSK.Entities
 
         public string LastName { get; set; }
 
-        public List<Order> Orders { get; set; }
+        public virtual ICollection<Order> Orders { get; set; }
 
         [ConcurrencyCheck]
         public DateTime? LastModified { get; set; }
