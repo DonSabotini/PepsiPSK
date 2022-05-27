@@ -28,6 +28,6 @@ namespace PepsiPSK.Entities
         [ConcurrencyCheck]
         public DateTime? LastModified { get; set; }
 
-        public List<FlowerOrder> FlowerOrders { get; set; }
+        public virtual ICollection<FlowerOrder>? FlowerOrders { get; set; }
     }
 }

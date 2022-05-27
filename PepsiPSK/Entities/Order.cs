@@ -23,7 +23,7 @@ namespace PepsiPSK.Entities
 
         public List<Flower> Flowers { get; set; }
 
-        public List<FlowerItem> Items { get; set; } = new List<FlowerItem>();
+        public virtual ICollection<FlowerItem>? Items { get; set; } = new List<FlowerItem>();
 
         [ConcurrencyCheck]
         public DateTime? LastModified { get; set; }
