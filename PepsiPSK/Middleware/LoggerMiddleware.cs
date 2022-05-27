@@ -7,19 +7,22 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.Controllers;
 using Pepsi.Data;
 using PepsiPSK.Entities;
+using PepsiPSK.Logger;
 
 namespace PepsiPSK.Middleware
 {
     public class LoggerMiddleware
     {
         private readonly RequestDelegate _next;
+        
         public LoggerMiddleware(RequestDelegate next)
         {
             _next = next;
         }
 
-        public async Task InvokeAsync(HttpContext context, DataContext dbcontext)
+        public async Task InvokeAsync(HttpContext context, IActionRecordLogger logger)
         {
+           /* DatabaseLogger logger = new DatabaseLogger(dbcontext);*/
             var endpoint = context.GetEndpoint();
             if (endpoint != null)
             {
@@ -33,16 +36,18 @@ namespace PepsiPSK.Middleware
                         var userRole = context.User.FindFirstValue(ClaimTypes.Role);
                         var controllerName = controllerActionDescriptor.ControllerName;
                         var actionName = controllerActionDescriptor.ActionName;
-
-                        dbcontext.ActionRecords.Add(new ActionRecord()
+                        var record = new ActionRecord()
                         {
                             UserName = user,
                             UserId = userId,
                             Role = userRole,
                             Time = DateTime.UtcNow,
                             UsedMethod = controllerName + "-" + actionName
-                        }); 
-                        dbcontext.SaveChanges();
+                        };
+                        logger.LogAction(record);
+
+
+
                     }
 
                 }
