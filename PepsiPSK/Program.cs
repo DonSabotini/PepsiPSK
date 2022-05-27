@@ -27,23 +27,6 @@ namespace PepsiPSK
 
             host.Run();
         }
-
-        /*public static IHostBuilder CreateHostBuilder(string[] args) =>
-            Host.ConfigureServices(services => services.AddAutofac())
-                .ConfigureWebHostDefaults(webBuilder =>
-                {
-                    webBuilder.UseStartup<Startup>();
-                });*/
     }
 }
-/*var builder = WebApplication.CreateBuilder(args);
 
-ConfigurationManager configuration = builder.Configuration;
-
-
-var app = builder.Build();
-
-
-
-
-app.Run();*/
