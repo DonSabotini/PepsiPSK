@@ -13,6 +13,7 @@ using PepsiPSK.Middleware;
 using Newtonsoft.Json.Linq;
 using PepsiPSK.CustomDI;
 using Newtonsoft.Json;
+using PepsiPSK.Services.Email;
 
 namespace PepsiPSK
 {
@@ -56,7 +57,7 @@ namespace PepsiPSK
             services.AddScoped<IEmailService>(x => new EmailService(Configuration["STMPCredentials:email"], Configuration["STMPCredentials:password"]));
             ConfigureJsonServices(services);
             ConfigureJsonDecorators(services);
-            
+
 
 
         }
