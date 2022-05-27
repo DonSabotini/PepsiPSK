@@ -7,7 +7,7 @@ namespace Pepsi.Data
     public class DataContext : IdentityDbContext<User>
     {
         public DataContext(DbContextOptions<DataContext> options) : base(options) { }
-
+        public DbSet<Photo> Photos { get; set; }
         public DbSet<Flower> Flowers { get; set; }
 
         public DbSet<Order> Orders { get; set; }
@@ -15,10 +15,11 @@ namespace Pepsi.Data
         public DbSet<FlowerOrder> FlowerOrders { get; set; }
         
         public DbSet<ActionRecord> ActionRecords { get; set; }
+        public DbSet<FlowerItem> FlowerItems { get; set; }
 
-        protected override void OnModelCreating(ModelBuilder builder)
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            builder.Entity<Flower>()
+            modelBuilder.Entity<Flower>()
            .HasMany(f => f.Orders)
            .WithMany(f => f.Flowers)
            .UsingEntity<FlowerOrder>(
@@ -28,7 +29,7 @@ namespace Pepsi.Data
                    flowerOrder.HasKey(fo => new { fo.FlowerId, fo.OrderId });
                });
 
-            base.OnModelCreating(builder);
+            base.OnModelCreating(modelBuilder);
         }
     }
 }

@@ -1,4 +1,4 @@
-﻿using PepsiPSK.Models.User;
+﻿using PepsiPSK.Entities;
 
 namespace PepsiPSK.Models.Flower
 {
@@ -14,8 +14,10 @@ namespace PepsiPSK.Models.Flower
 
         public int NumberInStock { get; set; }
 
-        public string? PhotoLink { get; set; }
+        public Guid? PhotoId { get; set; }
 
-        public DateTime AdditionTime { get; set; } = DateTime.UtcNow;
+        public DateTime AdditionTime { get; set; }
+
+        public DateTime? LastModified { get; set; }
     }
 }

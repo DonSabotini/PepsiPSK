@@ -18,28 +18,21 @@ namespace PepsiPSK.Controllers
         }
 
         [AllowAnonymous]
-        [HttpPost]
-        [Route("login")]
+        [HttpPost("login")]
         public async Task<IActionResult> Login([FromBody] LoginDto loginDto)
         {
             var loginResult = await _userService.Login(loginDto);
 
-            if (loginResult == null)
+            if (loginResult == null || !loginResult.IsSuccessful)
             {
-                return NotFound();
-            }
-
-            if(!loginResult.IsSuccessful)
-            {
-                return BadRequest(loginResult);
+                return NotFound(loginResult);
             }
 
             return Ok(loginResult);
         }
 
         [AllowAnonymous]
-        [HttpPost]
-        [Route("register")]
+        [HttpPost("register")]
         public async Task<IActionResult> Register([FromBody] RegistrationDto registrationDto)
         {
             var registrationResult = await _userService.Register(registrationDto);
@@ -61,8 +54,7 @@ namespace PepsiPSK.Controllers
         }
 
         [AllowAnonymous]
-        [HttpGet]
-        [Route("{id}")]
+        [HttpGet("{id}")]
         public async Task<IActionResult> GetUserById(string id)
         {
             var getResult = await _userService.GetUserById(id);
@@ -75,26 +67,48 @@ namespace PepsiPSK.Controllers
             return Ok(getResult);
         }
 
-        [HttpPut]
-        public async Task<IActionResult> UpdateUser(UpdateUserDto updateUserDto)
+        [HttpPut("{id}/change-password")]
+        public async Task<IActionResult> ChangePassword(string id, ChangePasswordDto changePasswordDto)
         {
-            var putResult = await _userService.UpdateUser(updateUserDto);
+            var serviceResponse = await _userService.ChangePassword(id, changePasswordDto);
 
-            if (putResult == null)
+            if (serviceResponse.StatusCode == 500 && serviceResponse.IsOptimisticLocking)
             {
-                return NotFound();
+                return StatusCode(serviceResponse.StatusCode, serviceResponse);
             }
 
-            if (!putResult.IsSuccessful)
+            if (serviceResponse.StatusCode == 404)
             {
-                return Unauthorized(putResult);
+                return StatusCode(serviceResponse.StatusCode, serviceResponse);
             }
 
-            return Ok(putResult);
+            if (serviceResponse.StatusCode == 401)
+            {
+                return StatusCode(serviceResponse.StatusCode, serviceResponse);
+            }
+
+            return StatusCode(serviceResponse.StatusCode, serviceResponse);
         }
 
-        [HttpDelete]
-        [Route("{id}")]
+        [HttpPut("{id}/update-details")]
+        public async Task<IActionResult> UpdateDetails(string id, UpdateUserDetailsDto updateUserDetailsDto)
+        {
+            var serviceResponse = await _userService.UpdateUserDetails(id, updateUserDetailsDto);
+
+            if (serviceResponse.StatusCode == 500 && serviceResponse.IsOptimisticLocking)
+            {
+                return StatusCode(serviceResponse.StatusCode, serviceResponse);
+            }
+
+            if (serviceResponse.StatusCode == 404)
+            {
+                return StatusCode(serviceResponse.StatusCode, serviceResponse);
+            }
+
+            return StatusCode(serviceResponse.StatusCode, serviceResponse);
+        }
+
+        [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteUser(string id)
         {
             var deleteResult = await _userService.DeleteUser(id);

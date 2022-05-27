@@ -32,7 +32,7 @@ namespace PepsiPSK.Controllers
             var flower = await _flowerService.GetFlowerById(guid);
             return flower == null ? NotFound() : Ok(flower);
         }
-
+ 
         [HttpPost]
         public async Task<IActionResult> AddFlower(AddFlowerDto addFlowerDto)
         {
@@ -40,11 +40,22 @@ namespace PepsiPSK.Controllers
             return Ok(addedFlower);
         }
 
-        [HttpPut]
-        public async Task<IActionResult> UpdateFlower(UpdateFlowerDto flowerDto)
+        [HttpPut("{guid}")]
+        public async Task<IActionResult> UpdateFlower(Guid guid, UpdateFlowerDto updateFlowerDto)
         {
-            var flower = await _flowerService.UpdateFlower(flowerDto);
-            return flower == null ? NotFound() : Ok(flower);
+            var serviceResponse = await _flowerService.UpdateFlower(guid, updateFlowerDto);
+
+            if (serviceResponse.StatusCode == 500 && serviceResponse.IsOptimisticLocking)
+            {
+                return StatusCode(serviceResponse.StatusCode, serviceResponse);
+            }
+
+            if (serviceResponse.StatusCode == 404)
+            {
+                return StatusCode(serviceResponse.StatusCode, serviceResponse);
+            }
+
+            return StatusCode(serviceResponse.StatusCode, serviceResponse);
         }
 
         [HttpDelete("{guid}")]
@@ -52,6 +63,25 @@ namespace PepsiPSK.Controllers
         {
             var successMessage = await _flowerService.DeleteFlower(guid);
             return successMessage == null ? NotFound() : Ok(successMessage);
+        }
+
+
+        [HttpPut("{guid}/update-stock")]
+        public async Task<IActionResult> UpdateStock(Guid guid, UpdateStockDto updateStockDto)
+        {
+            var serviceResponse = await _flowerService.UpdateStock(guid, updateStockDto);
+
+            if (serviceResponse.StatusCode == 500 && serviceResponse.IsOptimisticLocking)
+            {
+                return StatusCode(serviceResponse.StatusCode, serviceResponse);
+            }
+
+            if (serviceResponse.StatusCode == 404)
+            {
+                return StatusCode(serviceResponse.StatusCode, serviceResponse);
+            }
+
+            return StatusCode(serviceResponse.StatusCode, serviceResponse);
         }
     }
 }

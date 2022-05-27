@@ -28,8 +28,23 @@ namespace PepsiPSK.Controllers
         [HttpGet("{guid}")]
         public async Task<IActionResult> GetOrderById(Guid guid)
         {
-            var order = await _orderService.GetOrderById(guid);
-            return order == null ? NotFound() : Ok(order);
+            var serviceResponse = await _orderService.GetOrderById(guid);
+
+            if (serviceResponse.StatusCode == 404)
+            {
+                return StatusCode(serviceResponse.StatusCode, serviceResponse);
+            }
+
+            if (serviceResponse.StatusCode == 401)
+            {
+                return StatusCode(serviceResponse.StatusCode, serviceResponse);
+            }
+            if (serviceResponse.StatusCode == 500 && serviceResponse.IsOptimisticLocking)
+            {
+                return StatusCode(serviceResponse.StatusCode, serviceResponse);
+            }
+
+            return StatusCode(serviceResponse.StatusCode, serviceResponse);
         }
 
         [Authorize(Roles = "User, Admin")]
@@ -41,11 +56,27 @@ namespace PepsiPSK.Controllers
         }
 
         [Authorize(Roles = "User, Admin")]
-        [HttpPut]
-        public async Task<IActionResult> UpdateOrder(UpdateOrderDto updateOrderDto)
+        [HttpPut("{guid}/change-order-status")]
+        public async Task<IActionResult> UpdateOrder(Guid guid, ChangeOrderStatusDto changeOrderStatusDto)
         {
-            var order = await _orderService.UpdateOrder(updateOrderDto);
-            return order == null ? NotFound() : Ok(order);
+            var serviceResponse = await _orderService.UpdateOrder(guid, changeOrderStatusDto);
+
+            if (serviceResponse.StatusCode == 404)
+            {
+                return StatusCode(serviceResponse.StatusCode, serviceResponse);
+            }
+
+            if (serviceResponse.StatusCode == 401)
+            {
+                return StatusCode(serviceResponse.StatusCode, serviceResponse);
+            }
+
+            if (serviceResponse.StatusCode == 400)
+            {
+                return StatusCode(serviceResponse.StatusCode, serviceResponse);
+            }
+
+            return StatusCode(serviceResponse.StatusCode, serviceResponse);
         }
 
         [Authorize(Roles = "Admin")]

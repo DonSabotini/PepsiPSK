@@ -5,17 +5,14 @@ namespace PepsiPSK.Models.User
     public class RegistrationDto
     {
         [Required(ErrorMessage = "Username is required!")]
-        public string RegistrationUsername { get; set; }
+        public string Username { get; set; }
 
         [EmailAddress]
         [Required(ErrorMessage = "Email is required!")]
-        public string RegistrationEmail { get; set; }
+        public string Email { get; set; }
 
         [Required(ErrorMessage = "Password is required!")]
-        public string RegistrationPassword { get; set; }
-
-        [Required(ErrorMessage = "Repeated password is required!")]
-        public string RepeatedRegistrationPassword { get; set; }
+        public string Password { get; set; }
 
         [Required(ErrorMessage = "First name is required!")]
         public string FirstName { get; set; }

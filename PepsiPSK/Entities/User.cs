@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Identity;
+using System.ComponentModel.DataAnnotations;
 
 namespace PepsiPSK.Entities
 {
@@ -8,6 +9,9 @@ namespace PepsiPSK.Entities
 
         public string LastName { get; set; }
 
-        public List<Order> Orders { get; set; } = new List<Order>();
+        public List<Order> Orders { get; set; }
+
+        [ConcurrencyCheck]
+        public DateTime? LastModified { get; set; }
     }
 }

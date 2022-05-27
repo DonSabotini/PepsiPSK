@@ -4,11 +4,10 @@ namespace PepsiPSK.Models.User
 {
     public class LoginDto
     {
-        [EmailAddress]
-        [Required(ErrorMessage = "Email is required!")]
-        public string LoginEmail { get; set; }
+        [Required(ErrorMessage = "Username is required!")]
+        public string Username { get; set; }
 
         [Required(ErrorMessage = "Password is required!")]
-        public string LoginPassword { get; set; }
+        public string Password { get; set; }
     }
 }

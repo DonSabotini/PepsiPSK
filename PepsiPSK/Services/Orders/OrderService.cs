@@ -1,13 +1,14 @@
-﻿using AutoMapper;
+using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 using PepsiPSK.Entities;
-using PepsiPSK.Models.FlowerForOrder;
 using PepsiPSK.Models.Order;
 using PepsiPSK.Models.User;
 using PepsiPSK.Utils.Authentication;
 using Pepsi.Data;
-using System.Security;
-
+using PepsiPSK.Enums;
+using PepsiPSK.Responses.Service;
+using PepsiPSK.Services.Email;
+using PepsiPSK.Constants;
 
 namespace PepsiPSK.Services.Orders
 {
@@ -16,12 +17,14 @@ namespace PepsiPSK.Services.Orders
         private readonly DataContext _context;
         private readonly IMapper _mapper;
         private readonly ICurrentUserInfoRetriever _currentUserInfoRetriever;
+        private readonly IEmailService _emailService;
 
-        public OrderService(DataContext context, IMapper mapper, ICurrentUserInfoRetriever currentUserInfoRetriever)
+        public OrderService(DataContext context, IMapper mapper, ICurrentUserInfoRetriever currentUserInfoRetriever, IEmailService emailService)
         {
             _context = context;
             _mapper = mapper;
             _currentUserInfoRetriever = currentUserInfoRetriever;
+            _emailService = emailService;
         }
 
         private string GetCurrentUserId()
@@ -34,227 +37,178 @@ namespace PepsiPSK.Services.Orders
             return _currentUserInfoRetriever.CheckIfCurrentUserIsAdmin();
         }
 
+        public async Task<GetOrderDto> AddOrder(AddOrderDto addOrderDto)
+        {          
+            Order newOrder = _mapper.Map<Order>(addOrderDto);
+            newOrder.Description = addOrderDto.Description;
+            newOrder.PaymentMethod = addOrderDto.PaymentMethod;
+            newOrder.UserId = GetCurrentUserId();
+            newOrder.TotalCost = 0;
+
+            foreach (var orderedFlower in addOrderDto.FlowersForOrder)
+            {
+                Flower flowerFromDB = await _context.Flowers.FirstOrDefaultAsync(f => f.Id == orderedFlower.FlowerId);
+
+                if (flowerFromDB == null)
+                {
+                    throw new InvalidDataException("Flower with given id does not exist");
+                }
+                if (flowerFromDB.NumberInStock < orderedFlower.Amount)
+                {
+                    throw new InvalidDataException("Flower amount to low");
+                }
+                FlowerItem item = _mapper.Map<FlowerItem>(flowerFromDB);
+                flowerFromDB.NumberInStock -= orderedFlower.Amount;
+                item.Amount = orderedFlower.Amount;
+                newOrder.Items.Add(item);
+                newOrder.TotalCost += item.Price * orderedFlower.Amount;
+            }
+
+            await _context.Orders.AddAsync(newOrder);
+            await _context.SaveChangesAsync();
+            var result = _mapper.Map<GetOrderDto>(newOrder);
+            User orderUser = await _context.Users.FirstOrDefaultAsync(u => u.Id == newOrder.UserId);
+            result.UserInfo = _mapper.Map<UserInfoDto>(orderUser);
+            _emailService.sendEmail(new CreateOrderEmailTemplate(orderUser.Email, newOrder));
+            return result;
+        }
+        
         public async Task<List<GetOrderDto>> GetOrders()
         {
             if (AdminCheck())
             {
-                var ordersForAdmin = await _context.Orders.Select(order => order).ToListAsync();
-                var mappedOrdersForAdmin = new List<GetOrderDto>();
-
-                foreach(var order in ordersForAdmin)
+                var ordersForAdmin = await _context.Orders.Include(x => x.Items).Select(order => order).ToListAsync();
+                var result = _mapper.Map<List<GetOrderDto>>(ordersForAdmin);
+                foreach (var order in result)
                 {
-                    var mappedOrderForAdmin = new GetOrderDto
-                    {
-                        Id = order.Id,
-                        Description = order.Description,
-                        OrderStatus = order.OrderStatus,
-                        TotalCost = order.TotalCost,
-                        CreationTime = order.CreationTime,
-                        UserId = order.UserId
-                    };
-
-                    mappedOrdersForAdmin.Add(mappedOrderForAdmin);
+                    User orderUser = await _context.Users.FirstOrDefaultAsync(u => u.Id == order.UserId);
+                    order.UserInfo = _mapper.Map<UserInfoDto>(orderUser);
                 }
-     
-                var orderIdsForAdmin = ordersForAdmin.Select(o => o.Id).ToList();
-                var flowersForOrderForAdmin = await _context.FlowerOrders.Where(fo => orderIdsForAdmin.Contains(fo.OrderId)).ToListAsync();
-
-                for (int i = 0; i < mappedOrdersForAdmin.Count; i++)
-                {
-                    List<FlowerOrder> filtered = flowersForOrderForAdmin.FindAll(fo => fo.OrderId == mappedOrdersForAdmin[i].Id);
-
-                    for (int j = 0; j < filtered.Count; j++)
-                    {
-                        mappedOrdersForAdmin[i].FlowerOrderInfo.Add(new FlowerForOrderDto
-                        {
-                            FlowerId = filtered[j].FlowerId,
-                            Amount = filtered[j].Amount,
-                        });
-                    }
-                }
-
-                foreach (var adminOrder in mappedOrdersForAdmin)
-                {
-                    var userForAdmin = await _context.Users.FirstOrDefaultAsync(u => u.Id == adminOrder.UserId);
-                    adminOrder.UserInfo = _mapper.Map<UserInfo>(userForAdmin);
-                }
-
-                return mappedOrdersForAdmin;
+                return result;
             }
 
-            var orders = await _context.Orders.Where(o => o.UserId == GetCurrentUserId()).Select(order => order).ToListAsync();
-            var mappedOrders = new List<GetOrderDto>();
+            var orders = await _context.Orders.Include(x => x.Items).Where(o => o.UserId == GetCurrentUserId()).Select(order => order).ToListAsync();
 
-            foreach (var order in orders)
-            {
-                var mappedOrder = new GetOrderDto
-                {
-                    Id = order.Id,
-                    Description = order.Description,
-                    OrderStatus = order.OrderStatus,
-                    TotalCost = order.TotalCost,
-                    CreationTime = order.CreationTime,
-                    UserId = order.UserId
-                };
-
-                mappedOrders.Add(mappedOrder);
-            }
-
-            var orderIds = orders.Select(o => o.Id).ToList();
-            var flowersForOrder = await _context.FlowerOrders.Where(fo => orderIds.Contains(fo.OrderId)).ToListAsync();
-
-            for (int i = 0; i < mappedOrders.Count; i++)
-            {
-                List<FlowerOrder> filtered = flowersForOrder.FindAll(fo => fo.OrderId == mappedOrders[i].Id);
-
-                for (int j = 0; j < filtered.Count; j++)
-                {
-                    mappedOrders[i].FlowerOrderInfo.Add(new FlowerForOrderDto
-                    {
-                        FlowerId = filtered[j].FlowerId,
-                        Amount = filtered[j].Amount,
-                    });
-                }
-            }
-
-            foreach (var order in mappedOrders)
-            {
-                var user = await _context.Users.FirstOrDefaultAsync(u => u.Id == order.UserId);
-                order.UserInfo = _mapper.Map<UserInfo>(user);
-            }
-
-            return mappedOrders;
+            return _mapper.Map<List<GetOrderDto>>(orders);
         }
 
-        public async Task<GetOrderDto?> GetOrderById(Guid guid)
+        public async Task<ServiceResponse<GetOrderDto?>> GetOrderById(Guid guid)
         {
             var order = await _context.Orders.FirstOrDefaultAsync(o => o.Id == guid);
+            var serviceResponse = new ServiceResponse<GetOrderDto?>();
 
             if (order == null)
             {
-                return null;
+                serviceResponse.Data = null;
+                serviceResponse.StatusCode = 404;
+                serviceResponse.Message = "Specified order was not found!";
+
+                return serviceResponse;
             }
 
-            if (!AdminCheck() || order.UserId != GetCurrentUserId())
+            if (!AdminCheck() && order.UserId != GetCurrentUserId())
             {
-                throw new SecurityException();
+                serviceResponse.Data = null;
+                serviceResponse.StatusCode = 401;
+                serviceResponse.Message = "You do not have permission to view this order!";
+
+                return serviceResponse;
             }
 
-            var mappedOrder = new GetOrderDto
-            {
-                Id = order.Id,
-                Description = order.Description,
-                OrderStatus = order.OrderStatus,
-                TotalCost = order.TotalCost,
-                CreationTime = order.CreationTime,
-                UserId = order.UserId
-            };
+            var result = _mapper.Map<GetOrderDto>(order);
+            User orderUser = await _context.Users.FirstOrDefaultAsync(u => u.Id == order.UserId);
+            result.UserInfo = _mapper.Map<UserInfoDto>(orderUser);
 
-            var flowerForOrder = await _context.FlowerOrders.Where(fo => fo.OrderId == mappedOrder.Id).ToListAsync();
+            serviceResponse.Data = result;
+            serviceResponse.StatusCode = 200;
+            serviceResponse.Message = "Order successfully retrieved!";
 
-            for (int i = 0; i < flowerForOrder.Count; i++)
-            {
-                mappedOrder.FlowerOrderInfo.Add(new FlowerForOrderDto
-                {
-                    FlowerId = flowerForOrder[i].FlowerId,
-                    Amount = flowerForOrder[i].Amount
-                });
-            }
-
-            var user = await _context.Users.FirstOrDefaultAsync(u => u.Id == mappedOrder.UserId);
-            mappedOrder.UserInfo = _mapper.Map<UserInfo>(user);
-
-            return mappedOrder;
+            return serviceResponse;
         }
+ 
+   
 
-        public async Task<GetOrderDto> AddOrder(AddOrderDto addOrderDto)
+ 
+        public async Task<ServiceResponse<GetOrderDto?>> UpdateOrder(Guid guid, ChangeOrderStatusDto updateOrderDto)
         {
-            Order newOrder = new();
-            newOrder.Description = addOrderDto.Description;
-            var flowerIds = addOrderDto.Flowers.Select(f => f.FlowerId).ToList();
-            var orderedFlowers = await _context.Flowers.Where(flower => flowerIds.Contains(flower.Id)).ToListAsync();
-            newOrder.Flowers = orderedFlowers;
-            newOrder.UserId = GetCurrentUserId();
-            await _context.Orders.AddAsync(newOrder);
-            await _context.SaveChangesAsync();
+            var order = await _context.Orders.Include(x => x.Items).FirstOrDefaultAsync(o => o.Id == guid);
+            var serviceResponse = new ServiceResponse<GetOrderDto?>();
 
-            var addedOrder = await _context.Orders.FirstOrDefaultAsync(o => o.Id == newOrder.Id);
-            var flowerOrders = await _context.FlowerOrders.Where(fo => fo.OrderId == addedOrder.Id).ToListAsync();
-
-            var mappedOrder = new GetOrderDto
+            if (order == null)
             {
-                Id = addedOrder.Id,
-                Description = addedOrder.Description,
-                OrderStatus = addedOrder.OrderStatus,
-                TotalCost = addedOrder.TotalCost,
-                CreationTime = addedOrder.CreationTime,
-                UserId = addedOrder.UserId
-            };
+                serviceResponse.Data = null;
+                serviceResponse.StatusCode = 404;
+                serviceResponse.Message = "Specified order was not found!";
+
+                return serviceResponse;
+            }
+
+            if (!AdminCheck() && order.UserId != GetCurrentUserId())
+            {
+                serviceResponse.Data = null;
+                serviceResponse.StatusCode = 401;
+                serviceResponse.Message = "You do not have permission to update this order!";
+
+                return serviceResponse;
+            }
+            if (Nullable.Compare(updateOrderDto.LastModified, order.LastModified) != 0)
+            {
+                serviceResponse.Data = _mapper.Map<GetOrderDto>(order);
+                serviceResponse.StatusCode = 409;
+                serviceResponse.IsOptimisticLocking = true;
+                serviceResponse.Message = $"Order with order number of {order.OrderNumber} has already been updated!";
+
+                return serviceResponse;
+            }
+            if (order.OrderStatus != OrderStatus.Submitted)
+            {
+                serviceResponse.Data = null;
+                serviceResponse.StatusCode = 400;
+                serviceResponse.Message = "Cannot update order status to specified value!";
+                
+                return serviceResponse;
+            }
             
-            decimal totalCost = 0;
-
-            for (int i = 0; i < flowerOrders.Count; i++)
-            {
-                flowerOrders[i].Amount = addOrderDto.Flowers[i].Amount;
-                totalCost += addedOrder.Flowers[i].Price * flowerOrders[i].Amount;
-                mappedOrder.FlowerOrderInfo.Add(new FlowerForOrderDto
-                {
-                    FlowerId = flowerOrders[i].FlowerId,
-                    Amount = flowerOrders[i].Amount
-                });
-            }
-
-            addedOrder.TotalCost = totalCost;
-            mappedOrder.TotalCost = totalCost;
-            var user = await _context.Users.FirstOrDefaultAsync(u => u.Id == mappedOrder.UserId);
-            mappedOrder.UserInfo = _mapper.Map<UserInfo>(user);
-
-            await _context.SaveChangesAsync();
-            return mappedOrder;
-        }
-
-        public async Task<GetOrderDto?> UpdateOrder(UpdateOrderDto updateOrderDto)
-        {
-            var order = await _context.Orders.FirstOrDefaultAsync(o => o.Id == updateOrderDto.Id);
-
-            if (order == null)
-            {
-                return null;
-            }
-
-            if (!AdminCheck() || order.UserId != GetCurrentUserId())
-            {
-                throw new SecurityException();
-            }
 
             order.OrderStatus = updateOrderDto.OrderStatus;
-
-            var flowerForOrder = await _context.FlowerOrders.Where(fo => fo.OrderId == order.Id).ToListAsync();
-
-            var mappedOrder = new GetOrderDto
-            {
-                Id = order.Id,
-                Description = order.Description,
-                OrderStatus = order.OrderStatus,
-                TotalCost = order.TotalCost,
-                CreationTime = order.CreationTime,
-                UserId = order.UserId
-            };
-
-            for (int i = 0; i < flowerForOrder.Count; i++)
-            {
-                mappedOrder.FlowerOrderInfo.Add(new FlowerForOrderDto
-                {
-                    FlowerId = flowerForOrder[i].FlowerId,
-                    Amount = flowerForOrder[i].Amount
-                });
+            order.LastModified = DateTime.UtcNow;
+            User orderUser = await _context.Users.FirstOrDefaultAsync(u => u.Id == GetCurrentUserId());
+            switch (updateOrderDto.OrderStatus) {
+                case OrderStatus.Cancelled:
+                    foreach (var item in order.Items)
+                    {
+                        Flower flower = await _context.Flowers.FirstOrDefaultAsync(f => f.Id == item.FlowerId);
+                        if (flower != null)
+                            flower.NumberInStock += item.Amount;
+                        
+                    }
+                    _emailService.sendEmail(new CancelledOrderEmailTemplate(orderUser.Email, order));
+                    break;
+                case OrderStatus.Declined:
+                    foreach (var item in order.Items)
+                    {
+                        Flower flower = await _context.Flowers.FirstOrDefaultAsync(f => f.Id == item.FlowerId);
+                        if (flower != null)
+                            flower.NumberInStock += item.Amount;
+                        
+                    }
+                    _emailService.sendEmail(new DeclinedOrderEmailTemplate(orderUser.Email, order));
+                    break;
+                case OrderStatus.Finished:
+                    _emailService.sendEmail(new FinishedOrderEmailTemplate(orderUser.Email, order));
+                    break;
             }
 
             await _context.SaveChangesAsync();
+            var result = _mapper.Map<GetOrderDto>(order);       
+            result.UserInfo = _mapper.Map<UserInfoDto>(orderUser);
 
-            var user = await _context.Users.FirstOrDefaultAsync(u => u.Id == mappedOrder.UserId);
-            mappedOrder.UserInfo = _mapper.Map<UserInfo>(user);
-            return mappedOrder;
+            serviceResponse.Data = result;
+            serviceResponse.StatusCode = 200;
+            serviceResponse.IsSuccessful = true;
+            serviceResponse.Message = "Order successfully updated!";
+
+            return serviceResponse;
         }
 
         public async Task<string?> DeleteOrder(Guid guid)
@@ -268,6 +222,7 @@ namespace PepsiPSK.Services.Orders
 
             _context.Orders.Remove(order);
             await _context.SaveChangesAsync();
+
             return "Successfully deleted!";
         }
     }

@@ -193,6 +193,10 @@ namespace PepsiPSK.Migrations
                         .HasMaxLength(500)
                         .HasColumnType("character varying(500)");
 
+                    b.Property<DateTime?>("LastModified")
+                        .IsConcurrencyToken()
+                        .HasColumnType("timestamp with time zone");
+
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("text");
@@ -200,8 +204,8 @@ namespace PepsiPSK.Migrations
                     b.Property<int>("NumberInStock")
                         .HasColumnType("integer");
 
-                    b.Property<string>("PhotoLink")
-                        .HasColumnType("text");
+                    b.Property<Guid?>("PhotoId")
+                        .HasColumnType("uuid");
 
                     b.Property<decimal>("Price")
                         .HasPrecision(6, 2)
@@ -210,6 +214,40 @@ namespace PepsiPSK.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Flowers");
+                });
+
+            modelBuilder.Entity("PepsiPSK.Entities.FlowerItem", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<int>("Amount")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("Description")
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)");
+
+                    b.Property<Guid>("FlowerId")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<Guid>("OrderId")
+                        .HasColumnType("uuid");
+
+                    b.Property<decimal>("Price")
+                        .HasPrecision(6, 2)
+                        .HasColumnType("numeric(6,2)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("OrderId");
+
+                    b.ToTable("FlowerItems");
                 });
 
             modelBuilder.Entity("PepsiPSK.Entities.FlowerOrder", b =>
@@ -243,8 +281,24 @@ namespace PepsiPSK.Migrations
                         .HasMaxLength(500)
                         .HasColumnType("character varying(500)");
 
+                    b.Property<DateTime?>("LastModified")
+                        .IsConcurrencyToken()
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<int>("OrderNumber")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("OrderNumber"));
+
                     b.Property<int>("OrderStatus")
                         .HasColumnType("integer");
+
+                    b.Property<int>("PaymentMethod")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTime?>("StatusModificationTime")
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<decimal>("TotalCost")
                         .HasColumnType("numeric");
@@ -258,6 +312,29 @@ namespace PepsiPSK.Migrations
                     b.HasIndex("UserId");
 
                     b.ToTable("Orders");
+                });
+
+            modelBuilder.Entity("PepsiPSK.Entities.Photo", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("Content")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("ContentType")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("FileName")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Photos");
                 });
 
             modelBuilder.Entity("PepsiPSK.Entities.User", b =>
@@ -282,6 +359,10 @@ namespace PepsiPSK.Migrations
                     b.Property<string>("FirstName")
                         .IsRequired()
                         .HasColumnType("text");
+
+                    b.Property<DateTime?>("LastModified")
+                        .IsConcurrencyToken()
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("LastName")
                         .IsRequired()
@@ -383,10 +464,19 @@ namespace PepsiPSK.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("PepsiPSK.Entities.FlowerItem", b =>
+                {
+                    b.HasOne("PepsiPSK.Entities.Order", null)
+                        .WithMany("Items")
+                        .HasForeignKey("OrderId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
             modelBuilder.Entity("PepsiPSK.Entities.FlowerOrder", b =>
                 {
                     b.HasOne("PepsiPSK.Entities.Flower", null)
-                        .WithMany()
+                        .WithMany("FlowerOrders")
                         .HasForeignKey("FlowerId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -405,6 +495,16 @@ namespace PepsiPSK.Migrations
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+                });
+
+            modelBuilder.Entity("PepsiPSK.Entities.Flower", b =>
+                {
+                    b.Navigation("FlowerOrders");
+                });
+
+            modelBuilder.Entity("PepsiPSK.Entities.Order", b =>
+                {
+                    b.Navigation("Items");
                 });
 
             modelBuilder.Entity("PepsiPSK.Entities.User", b =>

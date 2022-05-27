@@ -52,9 +52,11 @@ namespace PepsiPSK
             {
                 options.UseNpgsql(Configuration.GetConnectionString("DefaultConnection"));
             });
-            services.AddAutoMapper(typeof(Program));   
+            services.AddAutoMapper(typeof(Program));
+            services.AddScoped<IEmailService>(x => new EmailService(Configuration["STMPCredentials:email"], Configuration["STMPCredentials:password"]));
             ConfigureJsonServices(services);
             ConfigureJsonDecorators(services);
+            
 
 
         }
@@ -97,7 +99,11 @@ namespace PepsiPSK
         }        
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
-
+            app.UseCors(x => x
+               .AllowAnyMethod()
+               .AllowAnyHeader()
+               .SetIsOriginAllowed(origin => true)
+               .AllowCredentials());
             app.UseHttpsRedirection();
             app.UseRouting();
             app.UseAuthentication();

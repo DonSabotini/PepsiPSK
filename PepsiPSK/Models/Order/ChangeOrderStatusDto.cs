@@ -2,10 +2,9 @@
 
 namespace PepsiPSK.Models.Order
 {
-    public class UpdateOrderDto
+    public class ChangeOrderStatusDto
     {
-        public Guid Id { get; set; }
-
+        public DateTime? LastModified { get; set; }
         public OrderStatus OrderStatus { get; set; }
     }
 }

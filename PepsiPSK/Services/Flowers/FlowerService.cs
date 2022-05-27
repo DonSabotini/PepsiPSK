@@ -2,8 +2,8 @@
 using Microsoft.EntityFrameworkCore;
 using PepsiPSK.Entities;
 using PepsiPSK.Models.Flower;
-using PepsiPSK.Utils.Authentication;
 using Pepsi.Data;
+using PepsiPSK.Responses.Service;
 
 namespace PepsiPSK.Services.Flowers
 {
@@ -11,13 +11,11 @@ namespace PepsiPSK.Services.Flowers
     {
         private readonly DataContext _context;
         private readonly IMapper _mapper;
-        private readonly ICurrentUserInfoRetriever _currentUserInfoRetriever;
 
-        public FlowerService(DataContext context, IMapper mapper, ICurrentUserInfoRetriever currentUserInfoRetriever)
+        public FlowerService(DataContext context, IMapper mapper)
         {
             _context = context;
             _mapper = mapper;
-            _currentUserInfoRetriever = currentUserInfoRetriever;
         }
 
         public async Task<List<GetFlowerDto>> GetFlowers()
@@ -30,7 +28,7 @@ namespace PepsiPSK.Services.Flowers
         {
             var flower = await _context.Flowers.FirstOrDefaultAsync(f => f.Id == guid);
 
-            if( flower == null)
+            if (flower == null)
             {
                 return null;
             }
@@ -49,23 +47,45 @@ namespace PepsiPSK.Services.Flowers
             return mappedFlower;
         }
 
-        public async Task<GetFlowerDto?> UpdateFlower(UpdateFlowerDto updateFlowerDto)
+        public async Task<ServiceResponse<GetFlowerDto?>> UpdateFlower(Guid guid, UpdateFlowerDto updateFlowerDto)
         {
-            var flower = await _context.Flowers.FirstOrDefaultAsync(f => f.Id == updateFlowerDto.Id);
+            var flower = await _context.Flowers.FirstOrDefaultAsync(f => f.Id == guid);
+            var serviceResponse = new ServiceResponse<GetFlowerDto?>();
 
             if (flower == null)
             {
-                return null;
+                serviceResponse.Data = null;
+                serviceResponse.StatusCode = 404;
+                serviceResponse.Message = $"Flower with ID of {guid} was not found!";
+
+                return serviceResponse;
+            }
+
+            if (Nullable.Compare(updateFlowerDto.LastModified, flower.LastModified) != 0)
+            {
+                serviceResponse.Data = null;
+                serviceResponse.StatusCode = 409;
+                serviceResponse.IsOptimisticLocking = true;
+                serviceResponse.Message = $"Flower with ID of {guid} has already been updated!";
+
+                return serviceResponse;
             }
 
             flower.Name = updateFlowerDto.Name;
             flower.Price = updateFlowerDto.Price;
-            flower.NumberInStock = updateFlowerDto.NumberInStock;
             flower.Description = updateFlowerDto.Description;
+            flower.NumberInStock = updateFlowerDto.NumberInStock;
+            flower.LastModified = DateTime.UtcNow;
             _context.Flowers.Update(flower);
             await _context.SaveChangesAsync();
             var mappedFlower = _mapper.Map<GetFlowerDto>(flower);
-            return mappedFlower;
+
+            serviceResponse.Data = mappedFlower;
+            serviceResponse.StatusCode = 200;
+            serviceResponse.IsSuccessful = true;
+            serviceResponse.Message = $"Flower with ID of {guid} was successfully updated!";
+
+            return serviceResponse;
         }
 
         public async Task<string?> DeleteFlower(Guid guid)
@@ -80,6 +100,42 @@ namespace PepsiPSK.Services.Flowers
             _context.Flowers.Remove(flower);
             await _context.SaveChangesAsync();
             return "Successfully deleted!";
+        }
+
+        public async Task<ServiceResponse<GetFlowerDto?>> UpdateStock(Guid guid, UpdateStockDto updateStockDto)
+        {
+            var flower = await _context.Flowers.FirstOrDefaultAsync(f => f.Id == guid);
+            var serviceResponse = new ServiceResponse<GetFlowerDto?>();
+
+            if (flower == null)
+            {
+                serviceResponse.Data = null;
+                serviceResponse.StatusCode = 404;
+                serviceResponse.Message = $"Flower with ID of {guid} was not found!";
+
+                return serviceResponse;
+            }
+
+            if (Nullable.Compare(updateStockDto.LastModified, flower.LastModified) != 0)
+            {
+                serviceResponse.Data = null;
+                serviceResponse.StatusCode = 500;
+                serviceResponse.Message = $"Flower with ID of {guid} has already been updated!";
+
+                return serviceResponse;
+            }
+
+            flower.NumberInStock += updateStockDto.FlowerAmount;
+            flower.LastModified = DateTime.UtcNow;
+            await _context.SaveChangesAsync();
+            var mappedFlower = _mapper.Map<GetFlowerDto>(flower);
+
+            serviceResponse.Data = mappedFlower;
+            serviceResponse.IsSuccessful = true;
+            serviceResponse.StatusCode = 200;
+            serviceResponse.Message = $"Stock of flower with ID of {guid} was successfully updated!";
+
+            return serviceResponse;
         }
     }
 }
