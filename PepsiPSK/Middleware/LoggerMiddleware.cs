@@ -29,7 +29,7 @@ namespace PepsiPSK.Middleware
                 var controllerActionDescriptor = endpoint.Metadata.GetMetadata<ControllerActionDescriptor>();
                 if (controllerActionDescriptor != null)
                 {
-                    var userId = context.User.FindFirstValue(ClaimTypes.NameIdentifier);     
+                    var userId = context.User.FindFirstValue("id");     
                     if (userId != null)
                     {
                         var user = context.User.Identity.Name;
