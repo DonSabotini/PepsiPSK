@@ -63,7 +63,7 @@ namespace PepsiPSK
         }
         private void ConfigureJsonServices(IServiceCollection services)
         {
-            var jsonServices = JObject.Parse(File.ReadAllText("appSettings.json"))["services"];
+            var jsonServices = JObject.Parse(File.ReadAllText("injections.json"))["services"];
             if (jsonServices == null || jsonServices.Count() == 0)
                 return;
             var requiredServices = JsonConvert.DeserializeObject<List<Service>>(jsonServices.ToString());
@@ -76,7 +76,7 @@ namespace PepsiPSK
         }
         private void ConfigureJsonDecorators(IServiceCollection services)
         {
-            var jsonServices = JObject.Parse(File.ReadAllText("appSettings.json"))["decorators"];
+            var jsonServices = JObject.Parse(File.ReadAllText("injections.json"))["decorators"];
             if (jsonServices == null || jsonServices.Count() == 0)
                 return;
             var requiredDecorators = JsonConvert.DeserializeObject<List<Decorator>>(jsonServices.ToString());
@@ -88,7 +88,7 @@ namespace PepsiPSK
         }
         private void ConfigureJsonMiddleware(IApplicationBuilder app)
         {
-            var jsonServices = JObject.Parse(File.ReadAllText("appSettings.json"))["middleware"];
+            var jsonServices = JObject.Parse(File.ReadAllText("injections.json"))["middleware"];
             if ( jsonServices == null || jsonServices.Count() == 0)
                 return;
             var requiredMiddleware = JsonConvert.DeserializeObject<List<MiddlewareConfig>>(jsonServices.ToString());
