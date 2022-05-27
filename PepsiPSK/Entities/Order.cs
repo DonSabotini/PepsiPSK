@@ -21,8 +21,6 @@ namespace PepsiPSK.Entities
 
         public DateTime CreationTime { get; set; } = DateTime.UtcNow;
 
-        public List<Flower> Flowers { get; set; }
-
         public virtual ICollection<FlowerItem>? Items { get; set; } = new List<FlowerItem>();
 
         [ConcurrencyCheck]
