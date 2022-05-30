@@ -1,6 +1,6 @@
 {
   "ConnectionStrings": {
-    "DefaultConnection": "Server=ec2-52-48-159-67.eu-west-1.compute.amazonaws.com;Port=5432;Database=devkmhrgk4eod2;User Id=xrmijxbnpolcnn;Password=70ef32928ea0ae4cea3a34bfa03ac83eff0792b706d5ef9b767ed83ea3f217f5;"
+    "DefaultConnection": "Server=ec2-52-30-159-47.eu-west-1.compute.amazonaws.com;Port=5432;Database=dcm009n5muicu1;User Id=jovluxeqrytrmn;Password=292544dddfc36729c345ac187782827fc3a14cda65ebeb154c2bd77bb13d7304;"
   },
   "Logging": {
     "LogLevel": {
