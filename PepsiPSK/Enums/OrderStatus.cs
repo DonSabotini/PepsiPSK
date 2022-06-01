@@ -5,6 +5,7 @@
         Submitted,
         Cancelled,
         Declined,
+        Ready,
         Finished
     }
 }

@@ -168,14 +168,7 @@ namespace PepsiPSK.Services.Orders
 
                 return serviceResponse;
             }
-            if (order.OrderStatus != OrderStatus.Submitted)
-            {
-                serviceResponse.Data = null;
-                serviceResponse.StatusCode = 400;
-                serviceResponse.Message = "Cannot update order status to specified value!";
-                
-                return serviceResponse;
-            }
+            
             
 
             order.OrderStatus = updateOrderDto.OrderStatus;
@@ -204,7 +197,7 @@ namespace PepsiPSK.Services.Orders
                     break;
                 case OrderStatus.Finished:
                     _emailService.sendEmail(new FinishedOrderEmailTemplate(orderUser.Email, order));
-                    break;
+                    break;         
             }
 
             await _context.SaveChangesAsync();
