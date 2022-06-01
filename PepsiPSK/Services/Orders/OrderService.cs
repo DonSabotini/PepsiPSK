@@ -197,7 +197,10 @@ namespace PepsiPSK.Services.Orders
                     break;
                 case OrderStatus.Finished:
                     _emailService.sendEmail(new FinishedOrderEmailTemplate(orderUser.Email, order));
-                    break;         
+                    break;
+                case OrderStatus.Ready:
+                    _emailService.sendEmail(new ReadyOrderEmailTemplate(orderUser.Email, order));
+                    break;
             }
 
             await _context.SaveChangesAsync();
