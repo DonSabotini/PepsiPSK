@@ -63,7 +63,7 @@ namespace PepsiPSK.Services.Flowers
 
             if (Nullable.Compare(updateFlowerDto.LastModified, flower.LastModified) != 0)
             {
-                serviceResponse.Data = null;
+                serviceResponse.Data = _mapper.Map<GetFlowerDto>(flower); 
                 serviceResponse.StatusCode = 409;
                 serviceResponse.IsOptimisticLocking = true;
                 serviceResponse.Message = $"Flower with ID of {guid} has already been updated!";
