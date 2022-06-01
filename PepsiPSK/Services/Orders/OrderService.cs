@@ -173,7 +173,7 @@ namespace PepsiPSK.Services.Orders
 
             order.OrderStatus = updateOrderDto.OrderStatus;
             order.LastModified = DateTime.UtcNow;
-            User orderUser = await _context.Users.FirstOrDefaultAsync(u => u.Id == GetCurrentUserId());
+            User orderUser = await _context.Users.FirstOrDefaultAsync(u => u.Id == order.UserId);
             switch (updateOrderDto.OrderStatus) {
                 case OrderStatus.Cancelled:
                     foreach (var item in order.Items)
