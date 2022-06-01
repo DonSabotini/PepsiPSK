@@ -22,7 +22,6 @@ namespace PepsiPSK.Middleware
 
         public async Task InvokeAsync(HttpContext context, IActionRecordLogger logger)
         {
-           /* DatabaseLogger logger = new DatabaseLogger(dbcontext);*/
             var endpoint = context.GetEndpoint();
             if (endpoint != null)
             {
@@ -32,7 +31,7 @@ namespace PepsiPSK.Middleware
                     var userId = context.User.FindFirstValue("id");     
                     if (userId != null)
                     {
-                        var user = context.User.Identity.Name;
+                        var user = context.User.FindFirstValue("username");
                         var userRole = context.User.FindFirstValue(ClaimTypes.Role);
                         var controllerName = controllerActionDescriptor.ControllerName;
                         var actionName = controllerActionDescriptor.ActionName;

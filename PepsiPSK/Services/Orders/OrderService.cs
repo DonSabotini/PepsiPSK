@@ -151,6 +151,14 @@ namespace PepsiPSK.Services.Orders
 
                 return serviceResponse;
             }
+            if (!AdminCheck() && updateOrderDto.OrderStatus != OrderStatus.Cancelled)
+            {
+                serviceResponse.Data = null;
+                serviceResponse.StatusCode = 401;
+                serviceResponse.Message = "You do not have permission to update this order!";
+
+                return serviceResponse;
+            }            
             if (Nullable.Compare(updateOrderDto.LastModified, order.LastModified) != 0)
             {
                 serviceResponse.Data = _mapper.Map<GetOrderDto>(order);

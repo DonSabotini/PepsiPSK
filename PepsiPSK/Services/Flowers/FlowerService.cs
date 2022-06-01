@@ -76,6 +76,7 @@ namespace PepsiPSK.Services.Flowers
             flower.Description = updateFlowerDto.Description;
             flower.NumberInStock = updateFlowerDto.NumberInStock;
             flower.LastModified = DateTime.UtcNow;
+            flower.PhotoId = updateFlowerDto.PhotoId;
             _context.Flowers.Update(flower);
             await _context.SaveChangesAsync();
             var mappedFlower = _mapper.Map<GetFlowerDto>(flower);
